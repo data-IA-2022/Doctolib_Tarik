@@ -1,0 +1,51 @@
+<!-- comptes.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Création de comptes - ToubibLib{% endblock %}
+{% block content %}
+<h1>Création de comptes</h1>
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    
+    <!-- Manually render form fields -->
+    <label for="{{ form.num_accounts.id_for_label }}">Number of Accounts:</label>
+    {{ form.num_accounts }}
+    
+    <label for="{{ form.account_type.id_for_label }}">Account Type:</label>
+    {{ form.account_type }}
+    
+    <button type="submit">Generate</button>
+</form>
+
+{% if created_accounts %}
+    <h2>Created Accounts</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <!-- Add other fields as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for account in created_accounts %}
+                <tr>
+                    <td>{{ account.id }}</td>
+                    <td>{{ account.username }}</td>
+                    <td>{{ account.role }}</td>
+                    <!-- Add other fields as needed -->
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}

@@ -1,21 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion</title>
-</head>
-<body>
-    <h1>Connexion</h1>
-    {{ message }}
-    <form method="post">
-        {% csrf_token %}
-        <input type="text" name="username" required>
-        <input type="password" name="motDePasse" required>
-        <input type="submit">
-    </form>
-    <p>Vous n'avez de compte ? Quel dommage ! Inscrivez sur le lien ci-dessous pour profiter de toutes les fonctionnalités</p>
-    <p><a href="{% url 'inscription' %}">M'inscrire</a></p>
-
-</body>
-</html>
+<!-- connexion.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Connexion - ToubibLib{% endblock %}
+{% block style %}
+    body {
+        background-color: #f2f2f2;
+        text-align: center;
+        padding: 50px;
+    }
+    .login-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        text-align: center;
+    }
+    .oval-button {
+        border-radius: 50px;
+    }
+    .signup-link {
+        font-size: 14px;
+    }
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="login-container">
+        <!-- Logo centered below email/username -->
+        <img src="{% static './img/toubiblib_logo.png' %}" alt="Logo" class="img-fluid mx-auto" style="max-width: 150px;">
+        <h1>Connexion</h1>
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+        
+        <form method="post">
+            {% csrf_token %}
+            <!-- Email/Username input -->
+            <div class="form-group">
+                <input type="text" class="form-control" name="username" placeholder="Username" required>
+            </div>
+            <!-- Password input -->
+            <div class="form-group">
+                <input type="password" class="form-control" name="motDePasse" placeholder="Password" required>
+            </div>
+            <!-- Login button -->
+            <button type="submit" class="btn btn-primary btn-block oval-button">Connexion</button>
+        </form>
+        <p>Vous n'avez pas de compte ? Quel dommage ! Inscrivez-vous en cliquant sur le lien ci-dessous pour profiter de toutes les fonctionnalités.</p>
+        <!-- Sign up link -->
+        <p class="signup-link"><a href="{% url 'inscription' %}">M'inscrire</a></p>
+    </div>
+</div>
+{% endblock %}

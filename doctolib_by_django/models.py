@@ -1,18 +1,3 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-
-class Utilisateurs(AbstractUser):
-    role_choices = [
-        ('admin', 'Admin'),
-        ('médecin', 'Médecin'),
-        ('patient', 'Patient'),
-    ]
-    role = models.CharField(max_length=10, choices=role_choices)
-    class Meta:
-        db_table = 'Utilisateurs'
-
-
-
 # This is an auto-generated Django model module.
 # You'll have to do the following manually to clean this up:
 #   * Rearrange models' order
@@ -131,9 +116,3 @@ class DjangoSession(models.Model):
     class Meta:
         managed = False
         db_table = 'django_session'
-
-# Create your models here.
-
-# class Connexion(models.Model):
-#   username = models.CharField(max_length=50)
-#   mdp = models.CharField(max_length=50)
