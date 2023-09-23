@@ -102,21 +102,20 @@ def associationMedecinPatient(request):
 
     if request.method == "POST":
         medecin_id = request.POST["medecin"]
-        patient_ids = request.POST.getlist("pats")
+        patient_ids = request.POST.getlist("patients")
         print("Medecin ID:", medecin_id)
         print("Patient IDs:", patient_ids)
 
         # Get the selected medic
         medic = Utilisateurs.objects.get(id=medecin_id)
         print(medic)
+
         # Associate the selected patients with the medic
+        medecin_patient, created = MedecinPatient.objects.get_or_create(medecin=medic)
         for patient_id in patient_ids:
             patient = Utilisateurs.objects.get(id=patient_id)
-            medecin_patient, created = MedecinPatient.objects.get_or_create(idMedecin=medic)
-            
-            medecin_patient.idPatient.add(patient)
-            medecin_patient.save()
-
+            medecin_patient.patient.add(patient)
+        
         return redirect("associationMedecinPatient")
 
     return render(request, "associationMedecinPatient.html", {
