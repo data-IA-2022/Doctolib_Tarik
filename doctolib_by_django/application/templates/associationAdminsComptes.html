@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<title>Association Admins</title>
+
+<h1>Bonjour {{prenom}} !</h1>
+<form method="post">
+  {% csrf_token %}
+  
+  <label>Choisissez les admins à associer :</label><br>
+  <select name="admins" id="admins" multiple required class="selectpicker" data-live-search="true">
+      {% for admin in admins %}
+      <option value="{{ admin.id }}">{{ admin.username }}</option>
+      {% endfor %}
+  </select>
+
+  <label>Choisissez les utilisateurs à associer :</label><br>
+  <select name="users" id="users" multiple required class="selectpicker" data-live-search="true">
+      {% for user in users_not_assigned %}
+      <option value="{{ user.id }}">{{ user.username }}</option>
+      {% endfor %}
+  </select>
+  <input type="submit" value="Associer">
+</form>
+
+<h2>Table d'association Admins</h2>
+<table>
+    <tr>
+        <th>
+            Admin
+        </th>
+        <th>
+            Utilisateurs
+        </th>
+    </tr>
+    {% for association in admin_associations %}
+    <tr>
+        <td>{{ association.admin.username }}</td>
+        <td>
+            {% for user in association.users.all %}
+            {{ user.username }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Initialize Bootstrap Selectpicker for the dropdowns -->
+<script>
+  $(document).ready(function () {
+      $('.selectpicker').selectpicker();
+  });
+</script>
+{% endblock %}

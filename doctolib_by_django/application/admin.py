@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AdminCompte, MédecinPatient, FormulaireSante, FormulaireEvalStress
+from .models import AdminCompte, MedecinPatient, FormulaireSante, FormulaireEvalStress
 from authentification.models import Utilisateurs
 
 # User Admin
@@ -10,11 +10,17 @@ class UtilisateurAdmin(admin.ModelAdmin):
     
 admin.site.register(Utilisateurs, UtilisateurAdmin)
 
-# Register the MédecinPatient model
-class MédecinPatientAdmin(admin.ModelAdmin):
-    list_display = ('médecin', 'patient')
+# Register the MedecinPatient model
+class MedecinPatientAdmin(admin.ModelAdmin):
+    list_display = ('medecin', 'display_patients')
 
-admin.site.register(MédecinPatient, MédecinPatientAdmin)
+    def display_patients(self, obj):
+        # Return a comma-separated list of patient usernames
+        return ', '.join(patient.username for patient in obj.patient.all())
+
+    display_patients.short_description = 'Patients'  # Sets the column header
+
+admin.site.register(MedecinPatient, MedecinPatientAdmin)
 
 # Register the AdminMédecin model
 class AdminCompteAdmin(admin.ModelAdmin):

@@ -12,12 +12,13 @@ from authentification.models import Utilisateurs
 #     role = models.CharField(max_length=255)
 
 # Association Table between Medecins and Patients
-class MédecinPatient(models.Model):
-    médecin = models.ForeignKey(Utilisateurs, on_delete=models.CASCADE, related_name='patients', limit_choices_to={'role': 'medecin'})
-    patient = models.ForeignKey(Utilisateurs, on_delete=models.CASCADE, related_name='medecins', limit_choices_to={'role': 'patient'})
+class MedecinPatient(models.Model):
+    medecin = models.ForeignKey(Utilisateurs, on_delete=models.CASCADE, related_name='comptes_medecin', limit_choices_to={'role': 'medecin'})
     
+    patient = models.ManyToManyField(Utilisateurs, related_name='patients_medecin', limit_choices_to={'role': 'patient'})
+        
     class Meta:
-        db_table = 'MédecinPatient'
+        db_table = 'MedecinCompte'
 
 # Association Table between Admins and Medecins
 class AdminCompte(models.Model):

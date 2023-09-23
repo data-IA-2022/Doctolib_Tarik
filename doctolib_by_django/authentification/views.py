@@ -16,6 +16,10 @@ def connexion(request):
                                     password = motDePasse)
         if verification != None:
             login(request, verification)
+            request.session['username'] = request.user.username
+            request.session['role'] = "superuser" if request.user.is_superuser else request.user.role
+            print(request.session['username'])
+            print(request.session['role'])
             return redirect("accueil")
         else:
             messages.error(request, 'username ou/et mot de passe incorrect')
@@ -25,6 +29,8 @@ def connexion(request):
 
 def deconnexion(request):
     logout(request)
+    request.session.pop('username', None)
+    request.session.pop('role', None)
     return redirect("connexion")
 
 

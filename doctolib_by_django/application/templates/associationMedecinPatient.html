@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<title>Association Medecin Patient</title>
+
+<h1>Bonjour {{prenom}} !</h1>
+<form method="post">
+    {% csrf_token %}
+
+    <label>Choisissez le médecin à associer :</label><br>
+    <select name="medecin" id="medecin" required class="selectpicker" data-live-search="true">
+        <option value="">Choisissez un médecin</option>
+        {% for medecin in medecins %}
+        <option value="{{ medecin.id }}">{{ medecin.username }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Choisissez les patients à associer :</label><br>
+    <select name="patients[]" id="pats" multiple required class="selectpicker" data-live-search="true">
+        <option value="">Choisissez un ou plusieurs patients</option>
+        {% for patient in patients %}
+        <option value="{{ patient.id }}">{{ patient.username }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Associer">
+</form>
+
+<h2>Table d'association Medecin Patient</h2>
+<table>
+    <tr>
+        <th>
+            Medecin
+        </th>
+        <th>
+            Patients
+        </th>
+    </tr>
+    {% for association in medecin_patient_associations %}
+    <tr>
+        <td>{{ association.idMedecin.username }}</td>
+        <td>
+            {% for patient in association.idPatient.all %}
+            {{ patient.username }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Initialize Bootstrap Selectpicker for the dropdowns -->
+<script>
+  $(document).ready(function () {
+      $('.selectpicker').selectpicker();
+  });
+  
+</script>
+{% endblock %}
