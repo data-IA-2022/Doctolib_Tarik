@@ -18,17 +18,17 @@ from django.contrib import admin
 from django.urls import path
 
 from application.views import accueil, comptes, menu, edaia, associationAdminsComptes, associationMedecinPatient
-from authentification.views import connexion, deconnexion, inscription
+from authentification.views import connexion, deconnexion, activate_account
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accueil', accueil, name="accueil"),
     path("", connexion, name="connexion"),
     path("comptes", comptes, name="comptes"),
+    path('activate_account', activate_account, name='activate_account'),
     path("edaia", edaia, name="edaia"),
     path("associationAdminsComptes", associationAdminsComptes, name="associationAdminsComptes"),
     path("associationMedecinPatient", associationMedecinPatient, name="associationMedecinPatient"),
     path('menu', menu, name='menu'),
     path("deconnexion", deconnexion, name="deconnexion"),
-    path("inscription", inscription, name="inscription"),
 ]

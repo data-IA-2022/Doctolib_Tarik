@@ -1,11 +1,16 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import AccountGenerationForm
+from .forms import AccountGenerationForm, EmailAssociationForm
 from django.contrib import messages
 from authentification.models import Utilisateurs
 from .models import AdminCompte, MedecinPatient
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 
-
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.template.loader import render_to_string
 
 
 
@@ -61,8 +66,9 @@ def comptes(request):
                     created_accounts.append(nouveauCompte)
                 
                 messages.success(request, f'{num_accounts} {account_type} account(s) created successfully.')
-
-                return render(request, 'comptes.html', {'form': form, 'created_accounts': created_accounts})
+                # Fetch user accounts that need activation (customize this filter as needed)
+                selected_accounts = Utilisateurs.objects.filter(needs_activation=True)
+                return render(request, 'comptes.html', {'form': form, 'created_accounts': created_accounts, 'selected_accounts': selected_accounts})
         else:
             form = AccountGenerationForm()
     
@@ -123,3 +129,6 @@ def associationMedecinPatient(request):
         "patients": patients,
         "medecin_patient_associations": medecin_patient_associations,
     })
+
+
+

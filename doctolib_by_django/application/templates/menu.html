@@ -25,7 +25,7 @@
             <li><a href="{% url 'associationAdminsComptes' %}">Associé un ou plusieurs Admin(s) à des comptes utilisateurs</a></li>
         {% endif %}
         {% if request.session.role == "admin" or request.session.role == "superuser" %}
-        <li><a href="{% url 'associationMedecinPatient' %}">Associé un médecin à un patient</a></li>
+        <li><a href="{% url 'associationMedecinPatient' %}">Associé un ou plusieurs Médecin(s) à des comptes patients</a></li>
         {% endif %}
         <li><a href="{% url 'deconnexion' %}">Déconnexion</a></li>
     </ul>

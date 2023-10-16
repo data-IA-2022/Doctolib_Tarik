@@ -1,0 +1,63 @@
+<!-- inscription.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Inscription - ToubibLib{% endblock %}
+{% block style %}
+    body {
+        background-color: #f2f2f2;
+        text-align: center;
+        padding: 50px;
+    }
+    .login-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        text-align: center;
+    }
+    .oval-button {
+        border-radius: 50px;
+    }
+    .signup-link {
+        font-size: 14px;
+    }
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="signup-container">
+            <h1>Activation Première connexion</h1>
+            <p>Voici une idée de Mot de passe :</p>
+            <p>{{ ideeMDP }}</p>
+            {% for message in messages %}
+            {{ message }}
+            {% endfor %}
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- New Username input -->
+                <div class="form-group">
+                    <label for="new_username">New Username:</label>
+                    <input type="text" id="new_username" name="new_username" required><br>
+                </div>
+                <!-- Password 1 input -->
+                <div class="form-group">
+                    <label for="new_password">New Password:</label>
+                    <input type="password" id="new_password" name="new_password" required><br>
+                </div>
+                <!-- Password 2 input -->
+                <div class="form-group">
+                    <label for="confirm_password">Confirm New Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required><br>
+                </div>
+                <!-- Update & activate button -->
+                <button type="submit" class="btn btn-primary btn-block oval-button">Update and Activate</button>
+            </form>
+            <!-- Return to login page link -->
+            <p>Revenir à la page de connexion</p>
+            <p class="login-link"><a href="{% url 'connexion' %}">Connexion</a></p>
+        </div>
+    </div>
+{% endblock %}
+

@@ -8,6 +8,8 @@ class Utilisateurs(AbstractUser):
         ('patient', 'Patient'),
     ]
     role = models.CharField(max_length=10, choices=role_choices)
+    # Add the needs_activation field
+    needs_activation = models.BooleanField(default=False)
     class Meta:
         db_table = 'Utilisateurs'
 

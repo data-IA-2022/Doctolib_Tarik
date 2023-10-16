@@ -33,6 +33,7 @@
                 <th>ID</th>
                 <th>Username</th>
                 <th>Role</th>
+                <th>Email</th>
                 <!-- Add other fields as needed -->
             </tr>
         </thead>
@@ -42,10 +43,45 @@
                     <td>{{ account.id }}</td>
                     <td>{{ account.username }}</td>
                     <td>{{ account.role }}</td>
+                    <td>{{ account.email }}</td>
                     <!-- Add other fields as needed -->
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+    
+    <h2>Activate Accounts</h2>
+    <form method="post" action="{% url 'activate_account' %}">
+        {% csrf_token %}
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in selected_accounts %}
+                    <tr>
+                        <td><input type="checkbox" name="selected_accounts" value="{{ account.id }}"></td>
+                        <td>{{ account.id }}</td>
+                        <td>{{ account.username }}</td>
+                        <td><input type="email" name="email_{{ account.id }}" required></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <button type="submit">Save & Activate</button>
+    </form>
 {% endif %}
+<!-- Initialize Bootstrap Selectpicker for the dropdowns -->
+<script>
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+    });
+</script>
 {% endblock %}
