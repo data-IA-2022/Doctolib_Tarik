@@ -5,3 +5,4 @@ sudo service docker start
 sudo service docker status
  docker ps
  docker-compose up
+python manage.py createsuperuser 

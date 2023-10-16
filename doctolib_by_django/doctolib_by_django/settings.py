@@ -93,6 +93,7 @@ DATABASES = {
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
         'HOST': os.environ.get('POSTGRES_HOST'),
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),  # Port defaults to 5432 if not specified
+        'SCHEMA': os.environ.get('POSTGRES_SCHEMA'), # Schéma bdd
     }
 }
 
