@@ -15,10 +15,10 @@ from authentification.models import Utilisateurs
 class MedecinPatient(models.Model):
     medecin = models.ForeignKey(Utilisateurs, on_delete=models.CASCADE, related_name='comptes_medecin', limit_choices_to={'role': 'medecin'})
     
-    patient = models.ManyToManyField(Utilisateurs, related_name='patients_medecin', limit_choices_to={'role': 'patient'})
+    patient = models.ManyToManyField(Utilisateurs, related_name='medecins', limit_choices_to={'role': 'patient'})
         
     class Meta:
-        db_table = 'MedecinCompte'
+        db_table = 'MedecinPatient'
 
 # Association Table between Admins and Medecins
 class AdminCompte(models.Model):
@@ -96,7 +96,6 @@ class FormulaireEvalStress(models.Model):
     date_remplissage = models.DateField()
     periodicite_jours = models.IntegerField()
     is_late = models.BooleanField(default=False)
-    donnees_formulaire = models.TextField()
     irritabilite = models.IntegerField()
     sentiments_depressifs = models.IntegerField()
     bouche_seche_gorge_seche = models.IntegerField()

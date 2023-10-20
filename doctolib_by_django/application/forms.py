@@ -1,5 +1,5 @@
 from django import forms
-from .models import Utilisateurs
+from .models import Utilisateurs, FormulaireSante
 
 class AccountGenerationForm(forms.Form):
     num_accounts = forms.IntegerField(label='Number of Accounts', min_value=1)
@@ -20,3 +20,11 @@ class EmailAssociationForm(forms.Form):
         required=True,
     )
     email = forms.EmailField(label='Email', required=True)
+    
+###### formulaire santé #############
+
+class FormulaireSanteForm(forms.ModelForm):
+    class Meta:
+        model = FormulaireSante
+        fields = '__all__'
+

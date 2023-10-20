@@ -1,32 +1,95 @@
 <!-- menu.html -->
 {% load static %}
-<nav>
-    <!-- Logo centered below email/username -->
-    <img src="{% static './img/toubiblib_logo.png' %}" alt="Logo" class="img-fluid mx-auto" style="max-width: 100px;">
-    <!-- Display username and role -->
-    <h3>{{ request.session.username }} ({{ request.session.role }})</h3>
-    <ul>
-        <li>
-            <a href="{% url 'accueil' %}">Accueil</a>
-        </li>
-        <li>Formulaires
-            <ul>
-                <li>
-                    <a href="#">Formulaire de santé générale</a></li>
-                <li><a href="#">Formulaire de niveau de stress</a></li>
-            </ul>
-        </li>
-        <li><a href="#">Historique</a></li>
-        {% if request.session.role == "medecin" %}
-            <li><a href="{% url 'edaia' %}">EDA et IA</a></li>
-        {% endif %}
-        {% if request.session.role == "superuser" %}
-            <li><a href="{% url 'comptes' %}">Comptes</a></li>
-            <li><a href="{% url 'associationAdminsComptes' %}">Associé un ou plusieurs Admin(s) à des comptes utilisateurs</a></li>
-        {% endif %}
-        {% if request.session.role == "admin" or request.session.role == "superuser" %}
-        <li><a href="{% url 'associationMedecinPatient' %}">Associé un ou plusieurs Médecin(s) à des comptes patients</a></li>
-        {% endif %}
-        <li><a href="{% url 'deconnexion' %}">Déconnexion</a></li>
-    </ul>
+<style src="{% static 'css/menu.css' %}"></style>
+<nav x-data="{ open: false }" class="bg-gray-200 text-blue-500">
+
+    <!-- Desktop Navigation -->
+    <div class="hidden md:flex items-center justify-between px-6 py-4">
+        <div>
+            <img src="{% static './img/toubiblib_logo.png' %}" alt="Logo" class="img-fluid mx-auto" style="max-width: 120px;">
+            <h3>{{ request.session.username }} ({{ request.session.role }})</h3>
+        </div>
+        <ul class="flex space-x-6">
+            <li><a href="{% url 'accueil' %}" class="hover:text-blue-700">Accueil</a></li>
+            
+            <!-- For "Formulaires" Dropdown -->
+            <li class="dropdown relative" x-data="{ openDropdown: false }">
+                <span @click="openDropdown = !openDropdown" class="cursor-pointer px-2 py-1 hover:bg-gray-300 rounded-md">Formulaires</span>
+                <ul x-show="openDropdown" class="dropdown-content absolute space-y-2 bg-gray-300 text-blue-500">
+                    <li><a href="{% url 'form_sante' %}">Formulaire de santé générale</a></li>
+                    <li><a href="#">Formulaire de niveau de stress</a></li>
+                </ul>
+            </li>
+            
+            <li><a href="#">Historique</a></li>
+            {% if request.session.role == "medecin" %}
+                <li><a href="{% url 'edaia' %}">EDA et IA</a></li>
+            {% endif %}
+            
+            <!-- Dropdown for Création & Associations -->
+            <li class="dropdown relative" x-data="{ openAssocDropdown: false }">
+                <span @click="openAssocDropdown = !openAssocDropdown" class="cursor-pointer px-2 py-1 hover:bg-gray-300 rounded-md">Création & Associations</span>
+                <ul x-show="openAssocDropdown" class="dropdown-content absolute space-y-2 bg-gray-300 text-blue-500">
+                    ...
+                    {% if request.session.role == "superuser" %}
+                        <li><a href="{% url 'comptes' %}">Comptes</a></li>
+                        <li><a href="{% url 'associationAdminsComptes' %}">Associé un ou plusieurs Admin(s) à des comptes utilisateurs</a></li>
+                    {% endif %}
+                    {% if request.session.role == "admin" or request.session.role == "superuser" %}
+                        <li><a href="{% url 'associationMedecinPatient' %}">Associé un ou plusieurs Médecin(s) à des comptes patients</a></li>
+                    {% endif %}
+                </ul>
+            </li>
+
+            <li><a href="{% url 'deconnexion' %}" class="hover:text-blue-700 bg-white py-1 px-4 rounded-full">Déconnexion</a></li>
+        </ul>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="md:hidden flex items-center justify-between px-6 py-4">
+        <div>
+            <img src="{% static './img/toubiblib_logo.png' %}" alt="Logo" class="img-fluid mx-auto" style="max-width: 120px;">
+            <h3>{{ request.session.username }} ({{ request.session.role }})</h3>
+        </div>
+        <button @click="open = !open" class="focus:outline-none">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm1 6a1 1 0 000 2h12a1 1 0 100-2H4zm1 6a1 1 0 100 2h12a1 1 0 100-2H5z" clip-rule="evenodd"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div x-show="open" class="bg-gray-200 text-blue-500">
+        <ul class="space-y-4 pl-8">
+            <li><a href="{% url 'accueil' %}" class="hover:text-gray-200">Accueil</a></li>
+            <!-- For "Formulaires" Dropdown -->
+            <li class="dropdown relative" x-data="{ openDropdown: false }">
+                <span @click="openDropdown = !openDropdown" class="cursor-pointer px-2 py-1 hover:bg-gray-300 rounded-md">Formulaires</span>
+                <ul x-show="openDropdown" class="dropdown-content absolute space-y-2 bg-gray-300 text-blue-500">
+                    <li><a href="{% url 'form_sante' %}">Formulaire de santé générale</a></li>
+                    <li><a href="#">Formulaire de niveau de stress</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Historique</a></li>
+            {% if request.session.role == "medecin" %}
+                <li><a href="{% url 'edaia' %}">EDA et IA</a></li>
+            {% endif %}
+            <!-- Dropdown for Création & Associations -->
+            <li class="dropdown relative" x-data="{ openAssocDropdown: false }">
+                <span @click="openAssocDropdown = !openAssocDropdown" class="cursor-pointer px-2 py-1 hover:bg-gray-300 rounded-md">Création & Associations</span>
+                <ul x-show="openAssocDropdown" class="dropdown-content absolute space-y-2 bg-gray-300 text-blue-500">
+                    ...
+                    {% if request.session.role == "superuser" %}
+                        <li><a href="{% url 'comptes' %}">Comptes</a></li>
+                        <li><a href="{% url 'associationAdminsComptes' %}">Associé un ou plusieurs Admin(s) à des comptes utilisateurs</a></li>
+                    {% endif %}
+                    {% if request.session.role == "admin" or request.session.role == "superuser" %}
+                        <li><a href="{% url 'associationMedecinPatient' %}">Associé un ou plusieurs Médecin(s) à des comptes patients</a></li>
+                    {% endif %}
+                </ul>
+            </li>
+            <li><a href="{% url 'deconnexion' %}" class="hover:text-blue-700 bg-white py-1 px-4 rounded-full">Déconnexion</a></li>
+        </ul>
+    </div>
 </nav>
+
+<script src="{% static 'js/menu.js' %}"></script>

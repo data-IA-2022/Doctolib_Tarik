@@ -1,0 +1,11 @@
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%; /* Position it right below the dropdown button */
+  left: 0; /* Align it to the left edge of the dropdown button */
+  z-index: 10; /* Ensure it's on top of other content */
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}

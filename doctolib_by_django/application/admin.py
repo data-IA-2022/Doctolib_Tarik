@@ -36,7 +36,7 @@ admin.site.register(AdminCompte, AdminCompteAdmin)
 # Register the FormulaireSante model
 class FormulaireSanteAdmin(admin.ModelAdmin):
     list_display = ('patient', 'date_remplissage', 'periodicite_jours')
-
+    # list_display = 
 admin.site.register(FormulaireSante, FormulaireSanteAdmin)
 
 # Register the FormulaireEvalStress model
