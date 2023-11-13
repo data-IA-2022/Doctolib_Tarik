@@ -2,52 +2,31 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Connexion - ToubibLib{% endblock %}
-{% block style %}
-    body {
-        background-color: #f2f2f2;
-        text-align: center;
-        padding: 50px;
-    }
-    .login-container {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #fff;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-        text-align: center;
-    }
-    .oval-button {
-        border-radius: 50px;
-    }
-    .signup-link {
-        font-size: 14px;
-    }
-{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="login-container">
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="max-w-sm mx-auto p-6 bg-white shadow-md rounded-lg text-center">
         <!-- Logo centered below email/username -->
-        <img src="{% static './img/toubiblib_logo.png' %}" alt="Logo" class="img-fluid mx-auto" style="max-width: 150px;">
-        <h1>Connexion</h1>
+        <img src="{% static './img/toubiblib_logo.png' %}" alt="Logo" class="mx-auto w-36">
+        <h1 class="text-xl font-semibold">Connexion</h1>
         {% for message in messages %}
-        {{ message }}
+        <p>{{ message }}</p>
         {% endfor %}
         
-        <form method="post">
+        <form method="post" class="mt-4">
             {% csrf_token %}
             <!-- Email/Username input -->
-            <div class="form-group">
-                <input type="text" class="form-control" name="username" placeholder="Username" required>
+            <div class="mb-4">
+                <input type="text" class="form-control" name="username" placeholder="Username" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
             </div>
             <!-- Password input -->
-            <div class="form-group">
-                <input type="password" class="form-control" name="motDePasse" placeholder="Password" required>
+            <div class="mb-4">
+                <input type="password" class="form-control" name="motDePasse" placeholder="Password" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
             </div>
             <!-- Login button -->
-            <button type="submit" class="btn btn-primary btn-block oval-button">Connexion</button>
+            <button type="submit" class="w-full px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600">Connexion</button>
         </form>
-        <p>Vous n'avez pas de compte ? Quel dommage ! Inscrivez-vous en cliquant sur le lien ci-dessous pour profiter de toutes les fonctionnalités.</p>
+        <p class="mt-4 text-sm">Vous n'avez pas de compte ? Quel dommage ! Inscrivez-vous en cliquant sur le lien ci-dessous pour profiter de toutes les fonctionnalités.</p>
         
     </div>
 </div>

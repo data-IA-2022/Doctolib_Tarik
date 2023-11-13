@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.utils.dateparse import parse_time
 from .forms import AccountGenerationForm, EmailAssociationForm, FormulaireSanteForm
 from django.views.generic.edit import FormView
 from django.http import HttpResponseRedirect, HttpResponse
@@ -34,11 +35,29 @@ def menu(request):
     return render(request, "menu.html")
 
 @login_required
+def historique(request):
+     # Je récupère les champs de la table formulaire santé
+    champsFormulaireSante = [field.name for field in FormulaireSante._meta.get_fields()]
+    # Je récupère les ids des lignes de la table formulaire santé
+    idDesFormulaires = [valeur.id for valeur in FormulaireSante.objects.all()]
+    # Je crée une liste qui contiendra les valeurs des lignes
+    # Il y a autant d'élément que de ligne, donc que d'ids récupéré
+    # FormulaireSante.objects.filter(id=id).values()[0].values()
+    # Dans le code ci-dessus je récupère la ligne ayant un certain id
+    # Ensuite je récupère les valeurs de la ligne .values
+    # Le 1er élément qui est le dictionnaire des colonnes/valeurs
+    # et enfin uniquement les valeurs
+    dataFormulaireSante = [FormulaireSante.objects.filter(id=id).values()[0].values() for id in idDesFormulaires]    
+    return render(request, "historique.html",{"dataFormulaireSante" : dataFormulaireSante,
+                   "champsFormulaireSante" : champsFormulaireSante})
+
+@login_required
 def edaia(request):
     if request.user.role != "medecin":
         return redirect("https://media.tenor.com/2euSOQYdz8oAAAAj/this-was-technically-illegal-maclen-stanley.gif")
     else:
         return render(request, "edaia.html")
+    
 
 @login_required
 def comptes(request):
@@ -147,125 +166,93 @@ def associationMedecinPatient(request):
 @login_required
 def formulaire_sante_gen(request):
     if request.method == 'POST':
-        # Extract data from the request.POST dictionary
-        patient_id = request.user.id
-        print("patient id : " + str(patient_id))
-        date_remplissage = datetime.date.today()  # Import 'datetime' for this
-        periodicite_jours = 30
-        is_late = False # Change this to the actual field name
-        poids = request.POST.get("poids")
-        tour_de_taille_cm = request.POST.get("tour_de_taille_cm")
-        frequence_cardiaque_min = request.POST.get("frequence_cardiaque_min")
-        tension_arterielle_systolique_matin = request.POST.get("tension_arterielle_systolique_matin")
-        tension_arterielle_systolique_soir = request.POST.get("tension_arterielle_systolique_soir")
-        tension_arterielle_diastolique_matin = request.POST.get("tension_arterielle_diastolique_matin")
-        tension_arterielle_diastolique_soir = request.POST.get("tension_arterielle_diastolique_soir")
-        symptomes_cardiovasculaires = request.POST.get("symptomes_cardiovasculaires")
-        nb_medicaments_jour = request.POST.get("nb_medicaments_jour")
-        oublie_medicament_matin = request.POST.get("oublie_medicament_matin") == "True"
-        oublie_medicament_soir = request.POST.get("oublie_medicament_soir") == "True"
-        effets_secondaires = request.POST.get("effets_secondaires") == "True"
-        symptomes_particuliers = request.POST.get("symptomes_particuliers") == "True"
-        consommation_alcool = request.POST.get("consommation_alcool") == "True"
-        grignotage_sucre = request.POST.get("grignotage_sucre") == "True"
-        grignotage_sale = request.POST.get("grignotage_sale") == "True"
-        nb_repas_jour = request.POST.get("nb_repas_jour")
-        quantite_eau_litres = request.POST.get("quantite_eau_litres")
-        quantite_alcool_litres = request.POST.get("quantite_alcool_litres")
-        activite_physique = request.POST.get("activite_physique") == "True"
-        nature_activite_physique = request.POST.get("nature_activite_physique")
-        duree_activite_physique_min = request.POST.get("duree_activite_physique_min")
-        dyspnee = request.POST.get("dyspnee") == "True"
-        oedeme = request.POST.get("oedeme") == "True"
-        pre_episode_ir = request.POST.get("pre_episode_ir") == "True"
-        fievre = request.POST.get("fievre") == "True"
-        palpitation = request.POST.get("palpitation") == "True"
-        douleur_thoracique = request.POST.get("douleur_thoracique") == "True"
-        malaise = request.POST.get("malaise") == "True"
-        heure_debut_palpitations_str = request.POST.get("heure_debut_palpitations")
-        heure_debut_palpitations = datetime.datetime.strptime(heure_debut_palpitations_str, '%H:%M').time() if heure_debut_palpitations_str else None
+        # Helper function to convert field values
+        def convert_field_value(value, field_type):
+            if value.strip() == '':
+                if field_type in ['int', 'float']:
+                    return None
+                elif field_type == 'bool':
+                    return False
+                return ''
+            if field_type == 'int':
+                return int(value)
+            elif field_type == 'float':
+                return float(value)
+            elif field_type == 'bool':
+                return value == 'True'
+            return value
 
-        duree_total_palpitations_min = request.POST.get("duree_total_palpitations_min")
-        heure_debut_douleurs_thoraciques_str = request.POST.get("heure_debut_douleurs_thoraciques")
-        heure_debut_douleurs_thoraciques = datetime.datetime.strptime(heure_debut_douleurs_thoraciques_str, '%H:%M').time() if heure_debut_douleurs_thoraciques_str else None
+        # Function to parse time fields
+        def parse_time_field(field_value):
+            if field_value.strip():
+                try:
+                    return parse_time(field_value)
+                except ValueError:
+                    return None
+            return None
+        
+        # Process each field from the form
+        form_data = {
+            'patient_id': request.user.id,
+            'date_remplissage': datetime.date.today(),
+            'periodicite_jours': 30,
+            'is_late': False,  # Assuming this is a mandatory field with a default value
+            'poids': convert_field_value(request.POST.get("poids", ''), 'float'),
+            'tour_de_taille_cm': convert_field_value(request.POST.get("tour_de_taille_cm", ''), 'float'),
+            'frequence_cardiaque_min': convert_field_value(request.POST.get("frequence_cardiaque_min", ''), 'int'),
+            'tension_arterielle_systolique_matin': convert_field_value(request.POST.get("tension_arterielle_systolique_matin", ''), 'float'),
+            'tension_arterielle_systolique_soir': convert_field_value(request.POST.get("tension_arterielle_systolique_soir", ''), 'float'),
+            'tension_arterielle_diastolique_matin': convert_field_value(request.POST.get("tension_arterielle_diastolique_matin", ''), 'float'),
+            'tension_arterielle_diastolique_soir': convert_field_value(request.POST.get("tension_arterielle_diastolique_soir", ''), 'float'),
+            'symptomes_cardiovasculaires': request.POST.get("symptomes_cardiovasculaires", ''),
+            'nb_medicaments_jour': convert_field_value(request.POST.get("nb_medicaments_jour", ''), 'int'),
+            'oublie_medicament_matin': convert_field_value(request.POST.get("oublie_medicament_matin", ''), 'bool'),
+            'oublie_medicament_soir': convert_field_value(request.POST.get("oublie_medicament_soir", ''), 'bool'),
+            'effets_secondaires': convert_field_value(request.POST.get("effets_secondaires", ''), 'bool'),
+            'symptomes_particuliers': request.POST.get("symptomes_particuliers", ''),
+            'consommation_alcool': convert_field_value(request.POST.get("consommation_alcool", ''), 'bool'),
+            'grignotage_sucre': convert_field_value(request.POST.get("grignotage_sucre", ''), 'bool'),
+            'grignotage_sale': convert_field_value(request.POST.get("grignotage_sale", ''), 'bool'),
+            'nb_repas_jour': convert_field_value(request.POST.get("nb_repas_jour", ''), 'int'),
+            'quantite_eau_litres': convert_field_value(request.POST.get("quantite_eau_litres", ''), 'float'),
+            'quantite_alcool_litres': convert_field_value(request.POST.get("quantite_alcool_litres", ''), 'float'),
+            'activite_physique': convert_field_value(request.POST.get("activite_physique", ''), 'bool'),
+            'nature_activite_physique': request.POST.get("nature_activite_physique", ''),
+            'duree_activite_physique_min': convert_field_value(request.POST.get("duree_activite_physique_min", ''), 'int'),
+            'dyspnee': convert_field_value(request.POST.get("dyspnee", ''), 'bool'),
+            'oedeme': convert_field_value(request.POST.get("oedeme", ''), 'bool'),
+            'pre_episode_ir': convert_field_value(request.POST.get("pre_episode_ir", ''), 'bool'),
+            'fievre': convert_field_value(request.POST.get("fievre", ''), 'bool'),
+            'palpitation': convert_field_value(request.POST.get("palpitation", ''), 'bool'),
+            'douleur_thoracique': convert_field_value(request.POST.get("douleur_thoracique", ''), 'bool'),
+            'malaise': convert_field_value(request.POST.get("malaise", ''), 'bool'),
+            'heure_debut_palpitations': parse_time_field(request.POST.get("heure_debut_palpitations", '')),
+            'duree_total_palpitations_min': convert_field_value(request.POST.get("duree_total_palpitations_min", ''), 'int'),
+            'heure_debut_douleurs_thoraciques': parse_time_field(request.POST.get("heure_debut_douleurs_thoraciques", '')),
+            'duree_total_douleurs_thoraciques_min': convert_field_value(request.POST.get("duree_total_douleurs_thoraciques_min", ''), 'int'),
+            'heure_debut_malaises': parse_time_field(request.POST.get("heure_debut_malaises", '')),
+            'duree_total_malaises_min': convert_field_value(request.POST.get("duree_total_malaises_min", ''), 'int'),
+            'natremie_mmol_per_l': convert_field_value(request.POST.get("natremie_mmol_per_l", ''), 'float'),
+            'potassium_mmol_per_l': convert_field_value(request.POST.get("potassium_mmol_per_l", ''), 'float'),
+            'creatinine_umol_per_l': convert_field_value(request.POST.get("creatinine_umol_per_l", ''), 'float'),
+            'clairance_creatinine_ml_per_min': convert_field_value(request.POST.get("clairance_creatinine_ml_per_min", ''), 'float'),
+            'nt_probnp_ng_per_l': convert_field_value(request.POST.get("nt_probnp_ng_per_l", ''), 'float'),
+            'fer_serique_mg_per_l': convert_field_value(request.POST.get("fer_serique_mg_per_l", ''), 'float'),
+            'hemoglobine_g_per_100_ml': convert_field_value(request.POST.get("hemoglobine_g_per_100_ml", ''), 'float'),
+            'vitesse_sedimentation_mm': convert_field_value(request.POST.get("vitesse_sedimentation_mm", ''), 'float'),
+            'proteine_c_reactive_mg_per_l': convert_field_value(request.POST.get("proteine_c_reactive_mg_per_l", ''), 'float'),
+            'troponine_ug_per_l': convert_field_value(request.POST.get("troponine_ug_per_l", ''), 'float'),
+            'vitamine_d_ng_per_ml': convert_field_value(request.POST.get("vitamine_d_ng_per_ml", ''), 'float'),
+            'acide_urique_mg_per_l': convert_field_value(request.POST.get("acide_urique_mg_per_l", ''), 'float'),
+            'inr': convert_field_value(request.POST.get("inr", ''), 'float'),
+        }
 
-        duree_total_douleurs_thoraciques_min = request.POST.get("duree_total_douleurs_thoraciques_min")
-        
-        heure_debut_malaises_str = request.POST.get("heure_debut_malaises")
-        heure_debut_malaises = datetime.datetime.strptime(heure_debut_malaises_str, '%H:%M').time() if heure_debut_malaises_str else None
-        
-        duree_total_malaises_min = request.POST.get("duree_total_malaises_min")
-        natremie_mmol_per_l = request.POST.get("natremie_mmol_per_l")
-        potassium_mmol_per_l = request.POST.get("potassium_mmol_per_l")
-        creatinine_umol_per_l = request.POST.get("creatinine_umol_per_l")
-        clairance_creatinine_ml_per_min = request.POST.get("clairance_creatinine_ml_per_min")
-        nt_probnp_ng_per_l = request.POST.get("nt_probnp_ng_per_l")
-        fer_serique_mg_per_l = request.POST.get("fer_serique_mg_per_l")
-        hemoglobine_g_per_100_ml = request.POST.get("hemoglobine_g_per_100_ml")
-        vitesse_sedimentation_mm = request.POST.get("vitesse_sedimentation_mm")
-        proteine_c_reactive_mg_per_l = request.POST.get("proteine_c_reactive_mg_per_l")
-        troponine_ug_per_l = request.POST.get("troponine_ug_per_l")
-        vitamine_d_ng_per_ml = request.POST.get("vitamine_d_ng_per_ml")
-        acide_urique_mg_per_l = request.POST.get("acide_urique_mg_per_l")
-        inr = request.POST.get("inr")
-        
-        # Create an instance of the model and save it
-        form_data = FormulaireSante(
-            patient_id=patient_id,
-            date_remplissage=date_remplissage,
-            periodicite_jours=periodicite_jours,
-            is_late=is_late,
-            poids=poids,
-            tour_de_taille_cm=tour_de_taille_cm,
-            frequence_cardiaque_min=frequence_cardiaque_min,
-            tension_arterielle_systolique_matin=tension_arterielle_systolique_matin,
-            tension_arterielle_systolique_soir=tension_arterielle_systolique_soir,
-            tension_arterielle_diastolique_matin=tension_arterielle_diastolique_matin,
-            tension_arterielle_diastolique_soir=tension_arterielle_diastolique_soir,
-            symptomes_cardiovasculaires=symptomes_cardiovasculaires,
-            nb_medicaments_jour=nb_medicaments_jour,
-            oublie_medicament_matin=oublie_medicament_matin,
-            oublie_medicament_soir=oublie_medicament_soir,
-            effets_secondaires=effets_secondaires,
-            symptomes_particuliers=symptomes_particuliers,
-            consommation_alcool=consommation_alcool,
-            grignotage_sucre=grignotage_sucre,
-            grignotage_sale=grignotage_sale,
-            nb_repas_jour=nb_repas_jour,
-            quantite_eau_litres=quantite_eau_litres,
-            quantite_alcool_litres=quantite_alcool_litres,
-            activite_physique=activite_physique,
-            nature_activite_physique=nature_activite_physique,
-            duree_activite_physique_min=duree_activite_physique_min,
-            dyspnee=dyspnee,
-            oedeme=oedeme,
-            pre_episode_ir=pre_episode_ir,
-            fievre=fievre,
-            palpitation=palpitation,
-            douleur_thoracique=douleur_thoracique,
-            malaise=malaise,
-            heure_debut_palpitations=heure_debut_palpitations,
-            duree_total_palpitations_min=duree_total_palpitations_min,
-            heure_debut_douleurs_thoraciques=heure_debut_douleurs_thoraciques,
-            duree_total_douleurs_thoraciques_min=duree_total_douleurs_thoraciques_min,
-            heure_debut_malaises=heure_debut_malaises,
-            duree_total_malaises_min=duree_total_malaises_min,
-            natremie_mmol_per_l=natremie_mmol_per_l,
-            potassium_mmol_per_l=potassium_mmol_per_l,
-            creatinine_umol_per_l=creatinine_umol_per_l,
-            clairance_creatinine_ml_per_min=clairance_creatinine_ml_per_min,
-            nt_probnp_ng_per_l=nt_probnp_ng_per_l,
-            fer_serique_mg_per_l=fer_serique_mg_per_l,
-            hemoglobine_g_per_100_ml=hemoglobine_g_per_100_ml,
-            vitesse_sedimentation_mm=vitesse_sedimentation_mm,
-            proteine_c_reactive_mg_per_l=proteine_c_reactive_mg_per_l,
-            troponine_ug_per_l=troponine_ug_per_l,
-            vitamine_d_ng_per_ml=vitamine_d_ng_per_ml,
-            acide_urique_mg_per_l=acide_urique_mg_per_l,
-            inr=inr,
-        )
-        form_data.save()
+        # Create and save the model instance
+        formulaire_sante = FormulaireSante(**form_data)
+        formulaire_sante.save()
+
         return HttpResponse('Formulaire envoyé')
+
     else:
         form = FormulaireSanteForm()
 

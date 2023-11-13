@@ -2,233 +2,179 @@
 {% load i18n %}
 {% load static %}
 {% block title %}Formulaire de santé générale - ToubibLib{% endblock %}
-{% block head %}
-{% block style %}
-    .form-step {
-        display: none;
-    }
-
-    .form-step.active {
-        display: block;
-    }
-
-    /* Progress bar styling */
-    .progress {
-        position: relative;
-        width: 100%;
-        height: 20px;
-        background-color: #f5f5f5;
-    }
-
-    .progress .progress-bar {
-        position: absolute;
-        height: 100%;
-        width: 0%; /* Initial width - set to 0 */
-        background-color: #3498db;
-        transition: width 0.3s;
-    }
-{% endblock %}
-
-{% endblock %}
 
 {% block content %}
-<form method="post" id="formulaire_sante_gen">
-    {% csrf_token %}
-    <!-- Progress Bar -->
-    <div class="progress">
-        <div class="progress-bar"></div>
+<div class="flex items-center justify-center  bg-gray-100">
+    <div class="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
+        <form method="post" id="formulaire_sante_gen" class="space-y-6">
+            {% csrf_token %}
+            <!-- Progress Bar -->
+            <div class="progress w-full bg-gray-200 rounded-full h-2 mb-4">
+                <div class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 16.6%;"></div>
+            </div>
+            <!-- End Progress Bar -->
+            <div class="form-step active" data-step="1">
+                <h2 class="text-xl font-semibold mb-4">Informations générales</h2>
+                <label for="poids">Poids :</label>
+                <input type="number" id="poids" name="poids">
+                <label for="tour_de_taille">Tour de taille en cm :</label>
+                <input type="number" id="tour_de_taille" name="tour_de_taille">
+                <div class="flex justify-end">
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Suivant</button>
+                </div>
+            </div>
+
+            <div class="form-step" data-step="2">
+                <h2 class="text-xl font-semibold mb-4">Informations cardiaques et tension artérielle</h2>
+                <label for="frequence_cardiaque">Fréquence cardiaque par minute :</label>
+                <input type="number" id="frequence_cardiaque" name="frequence_cardiaque">
+                <label for="tension_matin">Tension artérielle systolique (prise du matin) :</label>
+                <input type="number" id="tension_matin" name="tension_matin">
+                <label for="tension_soir">Tension artérielle systolique (prise du soir) :</label>
+                <input type="number" id="tension_soir" name="tension_soir">
+                <label for="tension_diastolique_matin">Tension artérielle diastolique (prise du matin) :</label>
+                <input type="number" id="tension_diastolique_matin" name="tension_diastolique_matin">
+                <label for="tension_diastolique_soir">Tension artérielle diastolique (prise du soir) :</label>
+                <input type="number" id="tension_diastolique_soir" name="tension_diastolique_soir">
+                <label for="symptomes_cardiovasculaires">Décrivez vos symptômes cardiovasculaires en quelques mots:</label>
+                <textarea id="symptomes_cardiovasculaires" name="symptomes_cardiovasculaires"></textarea>
+
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Précédent</button>
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Suivant</button>
+                </div>
+            </div>
+
+            <div class="form-step" data-step="3">
+                <h2 class="text-xl font-semibold mb-4">Prise de médicaments</h2>
+                <label for="nb_medicaments_jour">Nombre de médicaments pris dans la journée :</label>
+                <input type="number" id="nb_medicaments_jour" name="nb_medicaments_jour">
+                <label for="oublie_medicament_matin">Oublie de prendre le(s) médicament(s) le matin :</label>
+                <input type="checkbox" id="oublie_medicament_matin" name="oublie_medicament_matin" value="True">
+                <label for="oublie_medicament_soir">Oublie de prendre le(s) médicament(s) le soir :</label>
+                <input type="checkbox" id="oublie_medicament_soir" name="oublie_medicament_soir" value="True">
+                <label for="effets_secondaires">Effet(s) secondaire(s) remarqué(s) :</label>
+                <input type="checkbox" id="effets_secondaires" name="effets_secondaires" value="True">
+                <label for="symptomes_particuliers">Symptôme(s) particulier(s) remarqué(s) :</label>
+                <input type="checkbox" id="symptomes_particuliers" name="symptomes_particuliers" value="True">
+                <label for="description_symptomes_particuliers">Décrivez vos effets secondaires et/ou symptômes particuliers remarqués en quelques mots:</label>
+                <textarea id="description_symptomes_particuliers" name="description_symptomes_particuliers"></textarea>
+
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Précédent</button>
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Suivant</button>
+                </div>
+            </div>
+
+            <div class="form-step" data-step="4">
+                <h2 class="text-xl font-semibold mb-4">Alimentation</h2>
+                <label for="consommation_alcool">Consommation d'alcool :</label>
+                <input type="checkbox" id="consommation_alcool" name="consommation_alcool" value="True">
+                <label for="grignotage_sucre">Grignotage sucré :</label>
+                <input type="checkbox" id="grignotage_sucre" name="grignotage_sucre" value="True">
+                <label for="grignotage_sale">Grignotage salé :</label>
+                <input type="checkbox" id="grignotage_sale" name="grignotage_sale" value="True">
+                <label for="nb_repas_jour">Nombre de repas pris durant la journée :</label>
+                <input type="number" id="nb_repas_jour" name="nb_repas_jour">
+                <label for="quantite_eau_litres">Quantité d'eau bu en litre :</label>
+                <input type="number" id="quantite_eau_litres" name="quantite_eau_litres">
+                <label for="quantite_alcool_litres">Quantité d'alcool consommé en litre :</label>
+                <input type="number" id="quantite_alcool_litres" name="quantite_alcool_litres">
+
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Précédent</button>
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Suivant</button>
+                </div>
+            </div>
+
+            <div class="form-step" data-step="5">
+                <h2 class="text-xl font-semibold mb-4">Activité physique</h2>
+                <label for="activite_physique">J'ai eu une activité physique aujourd'hui :</label>
+                <input type="checkbox" id="activite_physique" name="activite_physique" value="True">
+                <label for="nature_activite_physique">Décrivez la nature de votre activité physique :</label>
+                <textarea id="nature_activite_physique" name="nature_activite_physique"></textarea>
+                <label for="duree_activite_physique_min">Durée de l'activité physique en minute :</label>
+                <input type="number" id="duree_activite_physique_min" name="duree_activite_physique_min">
+                
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Précédent</button>
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Suivant</button>
+                </div>
+            </div>
+
+            <div class="form-step" data-step="6">
+                <h2 class="text-xl font-semibold mb-4">Autres symptômes</h2>
+                <label for="dyspnee">Présence de dyspnée :</label>
+                <input type="checkbox" id="dyspnee" name="dyspnee" value="True">
+                <label for="oedeme">Présence d'œdème :</label>
+                <input type="checkbox" id="oedeme" name="oedeme" value="True">
+                <label for="pre_episode_ir">Pré d'épisode(s) ir :</label>
+                <input type="checkbox" id="pre_episode_ir" name="pre_episode_ir" value="True">
+                <label for="fievre">Présence de fièvre :</label>
+                <input type="checkbox" id="fievre" name="fievre" value="True">
+                <label for="palpitation">Présence de palpitation :</label>
+                <input type="checkbox" id="palpitation" name="palpitation" value="True">
+                <label for="douleur_thoracique">Présence de douleur thoracique :</label>
+                <input type="checkbox" id="douleur_thoracique" name="douleur_thoracique" value="True">
+                <label for="malaise">Présence de malaise :</label>
+                <input type="checkbox" id="malaise" name="malaise" value="True">
+                <label for="heure_debut_palpitations">Indiquez l'heure de début des palpitations :</label>
+                <input type="time" id="heure_debut_palpitations" name="heure_debut_palpitations">
+                <label for="duree_total_palpitations_min">Indiquez la durée total des palpitations apparues durant la journée en minute :</label>
+                <input type="number" id="duree_total_palpitations_min" name="duree_total_palpitations_min">
+                <label for="heure_debut_douleurs_thoraciques">Indiquez l'heure de début des douleurs thoraciques :</label>
+                <input type="time" id="heure_debut_douleurs_thoraciques" name="heure_debut_douleurs_thoraciques">
+                <label for="duree_total_douleurs_thoraciques_min">Indiquez la durée total des douleurs thoraciques apparues durant la journée en minute :</label>
+                <input type="text" id="duree_total_douleurs_thoraciques_min" name="duree_total_douleurs_thoraciques_min">
+                <label for="heure_debut_malaises">Indiquez l'heure de début des malaises :</label>
+                <input type="time" id="heure_debut_malaises" name="heure_debut_malaises">
+                <label for="duree_total_malaises_min">Indiquez la durée total des malaises apparus durant la journée en minute :</label>
+                <input type="number" id="duree_total_malaises_min" name="duree_total_malaises_min">
+                
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Précédent</button>
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Suivant</button>
+                </div>
+            </div>
+
+            <div class="form-step" data-step="7">
+                <h2 class="text-xl font-semibold mb-4">Autres informations médicales</h2>
+                <label for="natremie_mmol_per_l">Indiquez vos valeurs de natremie en mmol/l (millimoles per litre) :</label>
+                <input type="number" id="natremie_mmol_per_l" name="natremie_mmol_per_l">
+                <label for="potassium_mmol_per_l">Indiquez vos valeurs de potassium en mmol/l (millimoles per litre) :</label>
+                <input type="number" id="potassium_mmol_per_l" name="potassium_mmol_per_l">
+                <label for="creatinine_umol_per_l">Indiquez vos valeurs de créatinine en umol/l (micromoles per litre) :</label>
+                <input type="number" id="creatinine_umol_per_l" name="creatinine_umol_per_l">
+                <label for="clairance_creatinine_ml_per_min">Indiquez vos valeurs de clairance de créatinine en ml/min (millilitres per minute) :</label>
+                <input type="number" id="clairance_creatinine_ml_per_min" name="clairance_creatinine_ml_per_min">
+                <label for="nt_probnp_ng_per_l">Indiquez votre taux de NT Probnp en ng/l (nanogrammes per litre) :</label>
+                <input type="number" id="nt_probnp_ng_per_l" name="nt_probnp_ng_per_l">
+                <label for="fer_serique_mg_per_l">Indiquez votre taux de fer sérique en mg/l (milligrams per litre) :</label>
+                <input type="number" id="fer_serique_mg_per_l" name="fer_serique_mg_per_l">
+                <label for="hemoglobine_g_per_100_ml">Indiquez votre taux d'hémoglobine en g/100 ml (grams per 100 milliliters) :</label>
+                <input type="number" id="hemoglobine_g_per_100_ml" name="hemoglobine_g_per_100_ml">
+                <label for="vitesse_sedimentation_mm">Indiquez vos valeurs de Vitesse de sédimentation (VS) en millimètre :</label>
+                <input type="number" id="vitesse_sedimentation_mm" name="vitesse_sedimentation_mm">
+                <label for="proteine_c_reactive_mg_per_l">Indiquez votre taux de protéine C réactive en mg/l :</label>
+                <input type="number" id="proteine_c_reactive_mg_per_l" name="proteine_c_reactive_mg_per_l">
+                <label for="troponine_ug_per_l">Indiquez votre taux de troponine en ug/l (micrograms per litre) :</label>
+                <input type="number" id="troponine_ug_per_l" name="troponine_ug_per_l">
+                <label for="vitamine_d_ng_per_ml">Indiquez votre taux de vitamine D en ng/ml de sang :</label>
+                <input type="number" id="vitamine_d_ng_per_ml" name="vitamine_d_ng_per_ml">
+                <label for="acide_urique_mg_per_l">Indiquez votre taux d'acide urique en mg/l :</label>
+                <input type="number" id="acide_urique_mg_per_l" name="acide_urique_mg_per_l">
+                <label for="inr">Indiquez votre taux de INR (International Normalized Ratio) :</label>
+                <input type="number" id="inr" name="inr">
+
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Précédent</button>
+                    <input type="submit" value="Envoyer" class="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">
+                </div>
+            </div>
+        </form>
     </div>
-    <!-- End Progress Bar -->
-    <div class="form-step active" data-step="1">
-        <h2>Informations générales</h2>
-        <label for="poids">Poids :</label>
-        <input type="number" id="poids" name="poids">
-        <label for="tour_de_taille">Tour de taille en cm :</label>
-        <input type="number" id="tour_de_taille" name="tour_de_taille">
-        <button class="next">Suivant</button>
-    </div>
-
-    <div class="form-step" data-step="2">
-        <h2>Informations cardiaques et tension artérielle</h2>
-        <label for="frequence_cardiaque">Fréquence cardiaque par minute :</label>
-        <input type="number" id="frequence_cardiaque" name="frequence_cardiaque">
-        <label for="tension_matin">Tension artérielle systolique (prise du matin) :</label>
-        <input type="number" id="tension_matin" name="tension_matin">
-        <label for="tension_soir">Tension artérielle systolique (prise du soir) :</label>
-        <input type="number" id="tension_soir" name="tension_soir">
-        <label for="tension_diastolique_matin">Tension artérielle diastolique (prise du matin) :</label>
-        <input type="number" id="tension_diastolique_matin" name="tension_diastolique_matin">
-        <label for="tension_diastolique_soir">Tension artérielle diastolique (prise du soir) :</label>
-        <input type="number" id="tension_diastolique_soir" name="tension_diastolique_soir">
-        <label for="symptomes_cardiovasculaires">Décrivez vos symptômes cardiovasculaires en quelques mots:</label>
-        <textarea id="symptomes_cardiovasculaires" name="symptomes_cardiovasculaires"></textarea>
-
-        <button class="prev">Précédent</button>
-        <button class="next">Suivant</button>
-    </div>
-
-    <div class="form-step" data-step="3">
-        <h2>Prise de médicaments</h2>
-        <label for="nb_medicaments_jour">Nombre de médicaments pris dans la journée :</label>
-        <input type="number" id="nb_medicaments_jour" name="nb_medicaments_jour">
-        <label for="oublie_medicament_matin">Oublie de prendre le(s) médicament(s) le matin :</label>
-        <input type="checkbox" id="oublie_medicament_matin" name="oublie_medicament_matin" value="True">
-        <label for="oublie_medicament_soir">Oublie de prendre le(s) médicament(s) le soir :</label>
-        <input type="checkbox" id="oublie_medicament_soir" name="oublie_medicament_soir" value="True">
-        <label for="effets_secondaires">Effet(s) secondaire(s) remarqué(s) :</label>
-        <input type="checkbox" id="effets_secondaires" name="effets_secondaires" value="True">
-        <label for="symptomes_particuliers">Symptôme(s) particulier(s) remarqué(s) :</label>
-        <input type="checkbox" id="symptomes_particuliers" name="symptomes_particuliers" value="True">
-        <label for="description_symptomes_particuliers">Décrivez vos effets secondaires et/ou symptômes particuliers remarqués en quelques mots:</label>
-        <textarea id="description_symptomes_particuliers" name="description_symptomes_particuliers"></textarea>
-
-        <button class="prev">Précédent</button>
-        <button class="next">Suivant</button>
-    </div>
-
-    <div class="form-step" data-step="4">
-        <h2>Alimentation</h2>
-        <label for="consommation_alcool">Consommation d'alcool :</label>
-        <input type="checkbox" id="consommation_alcool" name="consommation_alcool" value="True">
-        <label for="grignotage_sucre">Grignotage sucré :</label>
-        <input type="checkbox" id="grignotage_sucre" name="grignotage_sucre" value="True">
-        <label for="grignotage_sale">Grignotage salé :</label>
-        <input type="checkbox" id="grignotage_sale" name="grignotage_sale" value="True">
-        <label for="nb_repas_jour">Nombre de repas pris durant la journée :</label>
-        <input type="number" id="nb_repas_jour" name="nb_repas_jour">
-        <label for="quantite_eau_litres">Quantité d'eau bu en litre :</label>
-        <input type="number" id="quantite_eau_litres" name="quantite_eau_litres">
-        <label for="quantite_alcool_litres">Quantité d'alcool consommé en litre :</label>
-        <input type="number" id="quantite_alcool_litres" name="quantite_alcool_litres">
-
-        <button class="prev">Précédent</button>
-        <button class="next">Suivant</button>
-    </div>
-
-    <div class="form-step" data-step="5">
-        <h2>Activité physique</h2>
-        <label for="activite_physique">J'ai eu une activité physique aujourd'hui :</label>
-        <input type="checkbox" id="activite_physique" name="activite_physique" value="True">
-        <label for="nature_activite_physique">Décrivez la nature de votre activité physique :</label>
-        <textarea id="nature_activite_physique" name="nature_activite_physique"></textarea>
-        <label for="duree_activite_physique_min">Durée de l'activité physique en minute :</label>
-        <input type="number" id="duree_activite_physique_min" name="duree_activite_physique_min">
-        
-        <button class="prev">Précédent</button>
-        <button class="next">Suivant</button>
-    </div>
-
-    <div class="form-step" data-step="6">
-        <h2>Autres symptômes</h2>
-        <label for="dyspnee">Présence de dyspnée :</label>
-        <input type="checkbox" id="dyspnee" name="dyspnee" value="True">
-        <label for="oedeme">Présence d'œdème :</label>
-        <input type="checkbox" id="oedeme" name="oedeme" value="True">
-        <label for="pre_episode_ir">Pré d'épisode(s) ir :</label>
-        <input type="checkbox" id="pre_episode_ir" name="pre_episode_ir" value="True">
-        <label for="fievre">Présence de fièvre :</label>
-        <input type="checkbox" id="fievre" name="fievre" value="True">
-        <label for="palpitation">Présence de palpitation :</label>
-        <input type="checkbox" id="palpitation" name="palpitation" value="True">
-        <label for="douleur_thoracique">Présence de douleur thoracique :</label>
-        <input type="checkbox" id="douleur_thoracique" name="douleur_thoracique" value="True">
-        <label for="malaise">Présence de malaise :</label>
-        <input type="checkbox" id="malaise" name="malaise" value="True">
-        <label for="heure_debut_palpitations">Indiquez l'heure de début des palpitations :</label>
-        <input type="time" id="heure_debut_palpitations" name="heure_debut_palpitations">
-        <label for="duree_total_palpitations_min">Indiquez la durée total des palpitations apparues durant la journée en minute :</label>
-        <input type="number" id="duree_total_palpitations_min" name="duree_total_palpitations_min">
-        <label for="heure_debut_douleurs_thoraciques">Indiquez l'heure de début des douleurs thoraciques :</label>
-        <input type="time" id="heure_debut_douleurs_thoraciques" name="heure_debut_douleurs_thoraciques">
-        <label for="duree_total_douleurs_thoraciques_min">Indiquez la durée total des douleurs thoraciques apparues durant la journée en minute :</label>
-        <input type="text" id="duree_total_douleurs_thoraciques_min" name="duree_total_douleurs_thoraciques_min">
-        <label for="heure_debut_malaises">Indiquez l'heure de début des malaises :</label>
-        <input type="time" id="heure_debut_malaises" name="heure_debut_malaises">
-        <label for="duree_total_malaises_min">Indiquez la durée total des malaises apparus durant la journée en minute :</label>
-        <input type="number" id="duree_total_malaises_min" name="duree_total_malaises_min">
-        <button class="prev">Précédent</button>
-        <button class="next">Suivant</button>
-    </div>
-
-    <div class="form-step" data-step="7">
-        <h2>Autres informations médicales</h2>
-        <label for="natremie_mmol_per_l">Indiquez vos valeurs de natremie en mmol/l (millimoles per litre) :</label>
-        <input type="number" id="natremie_mmol_per_l" name="natremie_mmol_per_l">
-        <label for="potassium_mmol_per_l">Indiquez vos valeurs de potassium en mmol/l (millimoles per litre) :</label>
-        <input type="number" id="potassium_mmol_per_l" name="potassium_mmol_per_l">
-        <label for="creatinine_umol_per_l">Indiquez vos valeurs de créatinine en umol/l (micromoles per litre) :</label>
-        <input type="number" id="creatinine_umol_per_l" name="creatinine_umol_per_l">
-        <label for="clairance_creatinine_ml_per_min">Indiquez vos valeurs de clairance de créatinine en ml/min (millilitres per minute) :</label>
-        <input type="number" id="clairance_creatinine_ml_per_min" name="clairance_creatinine_ml_per_min">
-        <label for="nt_probnp_ng_per_l">Indiquez votre taux de NT Probnp en ng/l (nanogrammes per litre) :</label>
-        <input type="number" id="nt_probnp_ng_per_l" name="nt_probnp_ng_per_l">
-        <label for="fer_serique_mg_per_l">Indiquez votre taux de fer sérique en mg/l (milligrams per litre) :</label>
-        <input type="number" id="fer_serique_mg_per_l" name="fer_serique_mg_per_l">
-        <label for="hemoglobine_g_per_100_ml">Indiquez votre taux d'hémoglobine en g/100 ml (grams per 100 milliliters) :</label>
-        <input type="number" id="hemoglobine_g_per_100_ml" name="hemoglobine_g_per_100_ml">
-        <label for="vitesse_sedimentation_mm">Indiquez vos valeurs de Vitesse de sédimentation (VS) en millimètre :</label>
-        <input type="number" id="vitesse_sedimentation_mm" name="vitesse_sedimentation_mm">
-        <label for="proteine_c_reactive_mg_per_l">Indiquez votre taux de protéine C réactive en mg/l :</label>
-        <input type="number" id="proteine_c_reactive_mg_per_l" name="proteine_c_reactive_mg_per_l">
-        <label for="troponine_ug_per_l">Indiquez votre taux de troponine en ug/l (micrograms per litre) :</label>
-        <input type="number" id="troponine_ug_per_l" name="troponine_ug_per_l">
-        <label for="vitamine_d_ng_per_ml">Indiquez votre taux de vitamine D en ng/ml de sang :</label>
-        <input type="number" id="vitamine_d_ng_per_ml" name="vitamine_d_ng_per_ml">
-        <label for="acide_urique_mg_per_l">Indiquez votre taux d'acide urique en mg/l :</label>
-        <input type="number" id="acide_urique_mg_per_l" name="acide_urique_mg_per_l">
-        <label for="inr">Indiquez votre taux de INR (International Normalized Ratio) :</label>
-        <input type="number" id="inr" name="inr">
-
-        <button class="prev">Précédent</button>
-        <input type="submit" value="Envoyer">
-    </div>
-    
-</form>
+</div>
 {% block scripts %}
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        let currentStep = 1;  // We start with step 1
-    
-        const formSteps = document.querySelectorAll('.form-step');
-        const nextButtons = document.querySelectorAll('.next');
-        const prevButtons = document.querySelectorAll('.prev');
-    
-        // Hide all steps except the first one
-        formSteps.forEach((step, index) => {
-            if(index !== 0) {
-                step.classList.remove('active');
-            }
-        });
-    
-        nextButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                if(currentStep < formSteps.length) {
-                    moveToStep(currentStep + 1);
-                }
-            });
-        });
-    
-        prevButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                if(currentStep > 1) {
-                    moveToStep(currentStep - 1);
-                }
-            });
-        });
-    
-        function moveToStep(step) {
-            // Hide current step
-            document.querySelector(`.form-step[data-step="${currentStep}"]`).classList.remove('active');
-    
-            // Show next step
-            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
-    
-            // Update currentStep value
-            currentStep = step;
-        }
-    });
-</script>
+<script src="{% static '/js/form_sante.js' %}"></script>
 {% endblock %}
 {% endblock %}

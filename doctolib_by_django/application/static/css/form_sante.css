@@ -1,0 +1,23 @@
+.form-step {
+  display: none;
+}
+
+.form-step.active {
+  display: block;
+}
+
+/* Progress bar styling */
+.progress {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  background-color: #f5f5f5 !important;
+}
+
+.progress .progress-bar {
+  position: absolute;
+  height: 100%;
+  width: 0%; /* Initial width - set to 0 */
+  background-color: #3498db;
+  transition: width 0.3s;
+}

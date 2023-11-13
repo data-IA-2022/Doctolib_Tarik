@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{% static '/img/toubiblib_logo.png' %}">
     <title>{% block title %}My App{% endblock %}</title>
     <!-- Add Bootstrap CSS link -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -13,12 +14,13 @@
     <link rel="stylesheet" href="{% static '/css/custom.css' %}">
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
+    
+    <link rel="stylesheet" type="text/css" href="{% static 'css/form_sante.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/menu.css' %}">
     <!-- Alpine JS -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
-    <style>
-      {% block style %}{% endblock %}
-    </style>
+    
+    
 </head>
 <body>
     {% if user.is_authenticated %}
