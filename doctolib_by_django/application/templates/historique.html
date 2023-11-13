@@ -3,26 +3,32 @@
 {% load static %}
 {% block title %}Historique data patient - ToubibLib{% endblock %}
 {% block content %}
-  <h2>Bienvenue dans la zone Historique Données Patients {{ request.session.username }}</h2>
-  <h2>Table données Formulaire santé</h2>
-<table id="example">
-    <thead>
+<div class="w-full flex flex-col items-center px-4 py-5">
+  <h2 class="text-xl font-semibold mb-4">Bienvenue dans la zone Historique Données Patients {{ request.session.username }}</h2>
+  <div class="w-full overflow-x-auto">
+    <h2 class="text-lg font-semibold mb-3">Table données Formulaire santé</h2>
+    <table id="example" class="min-w-full">
+        <thead>
+            <tr>
+                {% for colonne in champsFormulaireSante %}
+                <th class="px-4 py-2 bg-gray-100">
+                    {{ colonne }}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for data in dataFormulaireSante %}
         <tr>
-            {% for colonne in champsFormulaireSante %}
-            <th>
-                {{ colonne }}
-            </th>
+            {% for element in data %}
+                <td class="border px-4 py-2">
+                {{ element }}
+                </td>
             {% endfor %}
         </tr>
-    </thead>
-    {% for data in dataFormulaireSante %}
-    <tr>
-        {% for element in data %}
-            <th>
-            {{ element }}
-            </th>
         {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
+        </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

@@ -21,7 +21,7 @@
                 </ul>
             </li>
             
-            <li><a href="#">Historique</a></li>
+            <li><a href="{% url 'historique' %}">Historique</a></li>
             {% if request.session.role == "medecin" %}
                 <li><a href="{% url 'edaia' %}">EDA et IA</a></li>
             {% endif %}
@@ -61,7 +61,7 @@
 
     <div x-show="open" class="bg-gray-200 text-blue-500">
         <ul class="space-y-4 pl-8">
-            <li><a class="text-xs sm:text-md" href="{% url 'accueil' %}" class="hover:text-gray-200">Accueil</a></li>
+            <li><a class="text-xs sm:text-md hover:text-gray-200" href="{% url 'accueil' %}" class="hover:text-gray-200">Accueil</a></li>
             <!-- For "Formulaires" Dropdown -->
             <li class="dropdown relative" x-data="{ openDropdown: false }">
                 <span @click="openDropdown = !openDropdown" class="cursor-pointer px-2 py-1 hover:bg-gray-300 rounded-md">Formulaires</span>
@@ -70,7 +70,7 @@
                     <li><a class="text-xs sm:text-md" href="#">Formulaire de niveau de stress</a></li>
                 </ul>
             </li>
-            <li><a class="text-xs sm:text-md" href="{% url 'historique' %}">Historique</a></li>
+            <li><a class="text-xs sm:text-md" href="{% url 'historique' %}" class="hover:text-gray-200">Historique</a></li>
             {% if request.session.role == "medecin" %}
                 <li><a class="text-xs sm:text-md" href="{% url 'edaia' %}">EDA et IA</a></li>
             {% endif %}
