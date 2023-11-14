@@ -54,12 +54,14 @@ def historique(request):
                 association.save()
             return redirect('historique')
 
+     # Fetch data based on user role
     if user_role in ['admin', 'superadmin']:
         queryset = FormulaireSante.objects.all()
     elif user_role == 'medecin':
         patient_ids = MedecinPatientAssociation.objects.filter(medecin__medecin_id=user_id).values_list('patient', flat=True)
         queryset = FormulaireSante.objects.filter(patient_id__in=patient_ids).annotate(patient_username=F('patient__username'))
-        # Pass the form to the template
+    elif user_role == 'patient':
+        queryset = FormulaireSante.objects.filter(patient_id=user_id)  # This line is added for patient role
     else:
         queryset = []
 
@@ -234,7 +236,23 @@ def formulaire_sante_gen(request):
             periodicite_value = None  # Or set a default value as appropriate
         
         print(periodicite_value)  # For debugging, should show the periodicite or None 
-        
+         # Fetch the last date_remplissage for the patient
+        try:
+            last_formulaire = FormulaireSante.objects.filter(patient_id=request.user.id).latest('date_remplissage')
+            last_date_remplissage = last_formulaire.date_remplissage
+        except FormulaireSante.DoesNotExist:
+            last_date_remplissage = None
+
+        # Determine the next due date
+        if periodicite_value is not None and last_date_remplissage:
+            next_due_date = last_date_remplissage + datetime.timedelta(days=periodicite_value)
+        else:
+            next_due_date = datetime.date.today() + datetime.timedelta(days=30)  # default value
+
+        # Determine is_late and is_early
+        today = datetime.date.today()
+        is_late = today > next_due_date
+        is_early = today < next_due_date
         
         # Helper function to convert field values
         def convert_field_value(value, field_type):
@@ -266,7 +284,8 @@ def formulaire_sante_gen(request):
             'patient_id': request.user.id,
             'date_remplissage': datetime.date.today(),
             'periodicite_jours': periodicite_value if periodicite_value is not None else 30,  # Use the retrieved value or a default
-            'is_late': False,  # Assuming this is a mandatory field with a default value
+            'is_late': is_late,  # Assuming this is a mandatory field with a default value
+            'is_early': is_early,  # Assuming this is a mandatory field with a default value
             'poids': convert_field_value(request.POST.get("poids", ''), 'float'),
             'tour_de_taille_cm': convert_field_value(request.POST.get("tour_de_taille_cm", ''), 'float'),
             'frequence_cardiaque_min': convert_field_value(request.POST.get("frequence_cardiaque_min", ''), 'int'),
