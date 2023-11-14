@@ -14,11 +14,19 @@ import numpy as np
 # Association Table between Medecins and Patients
 class MedecinPatient(models.Model):
     medecin = models.ForeignKey(Utilisateurs, on_delete=models.CASCADE, related_name='comptes_medecin', limit_choices_to={'role': 'medecin'})
+    patient = models.ManyToManyField(Utilisateurs, through='MedecinPatientAssociation', related_name='medecins', limit_choices_to={'role': 'patient'})
+    is_admin_validation = models.BooleanField(default=False)
     
-    patient = models.ManyToManyField(Utilisateurs, related_name='medecins', limit_choices_to={'role': 'patient'})
-        
     class Meta:
         db_table = 'MedecinPatient'
+
+class MedecinPatientAssociation(models.Model):
+    medecin = models.ForeignKey(MedecinPatient, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Utilisateurs, on_delete=models.CASCADE)
+    periodicite = models.IntegerField(null=True, blank=True)
+    
+    class Meta:
+        db_table = 'MedecinPatient_association'  # Your explicit table name
 
 # Association Table between Admins and Medecins
 class AdminCompte(models.Model):

@@ -1,14 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.dateparse import parse_time
-from .forms import AccountGenerationForm, EmailAssociationForm, FormulaireSanteForm
+from .forms import AccountGenerationForm, EmailAssociationForm, FormulaireSanteForm, PeriodiciteForm
 from django.views.generic.edit import FormView
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from django.urls import reverse
+from django.forms.models import model_to_dict
+from django.db.models import F
 
 from django.contrib import messages
 from authentification.models import Utilisateurs
-from .models import AdminCompte, MedecinPatient
+from application.models import AdminCompte, MedecinPatient, FormulaireSante, MedecinPatientAssociation
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -18,9 +20,6 @@ from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
  
 import datetime
-
-from application.models import FormulaireSante
-
 
 
 # Create your views here.
@@ -36,20 +35,47 @@ def menu(request):
 
 @login_required
 def historique(request):
-     # Je récupère les champs de la table formulaire santé
+    user_role = request.session.get('role')
+    user_id = request.user.id
+
     champsFormulaireSante = [field.name for field in FormulaireSante._meta.get_fields()]
-    # Je récupère les ids des lignes de la table formulaire santé
-    idDesFormulaires = [valeur.id for valeur in FormulaireSante.objects.all()]
-    # Je crée une liste qui contiendra les valeurs des lignes
-    # Il y a autant d'élément que de ligne, donc que d'ids récupéré
-    # FormulaireSante.objects.filter(id=id).values()[0].values()
-    # Dans le code ci-dessus je récupère la ligne ayant un certain id
-    # Ensuite je récupère les valeurs de la ligne .values
-    # Le 1er élément qui est le dictionnaire des colonnes/valeurs
-    # et enfin uniquement les valeurs
-    dataFormulaireSante = [FormulaireSante.objects.filter(id=id).values()[0].values() for id in idDesFormulaires]    
-    return render(request, "historique.html",{"dataFormulaireSante" : dataFormulaireSante,
-                   "champsFormulaireSante" : champsFormulaireSante})
+
+    # Initialize the form with no instance
+    form = PeriodiciteForm()
+
+    if request.method == 'POST':
+        form = PeriodiciteForm(request.POST)
+        if form.is_valid():
+            periodicite = form.cleaned_data['periodicite']
+            # Fetch all associations for the medecin and update periodicite
+            associations = MedecinPatientAssociation.objects.filter(medecin__medecin_id=user_id)
+            for association in associations:
+                association.periodicite = periodicite
+                association.save()
+            return redirect('historique')
+
+    if user_role in ['admin', 'superadmin']:
+        queryset = FormulaireSante.objects.all()
+    elif user_role == 'medecin':
+        patient_ids = MedecinPatientAssociation.objects.filter(medecin__medecin_id=user_id).values_list('patient', flat=True)
+        queryset = FormulaireSante.objects.filter(patient_id__in=patient_ids).annotate(patient_username=F('patient__username'))
+        # Pass the form to the template
+    else:
+        queryset = []
+
+    dataFormulaireSante = [model_to_dict(obj) for obj in queryset]
+    for data in dataFormulaireSante:
+        patient_id = data['patient']
+        patient_user = Utilisateurs.objects.get(id=patient_id)
+        data['patient'] = patient_user.username
+
+    context = {
+        "form": form,
+        "dataFormulaireSante": dataFormulaireSante,
+        "champsFormulaireSante": champsFormulaireSante,
+        "user_role": user_role,  # Pass the user_role to the template
+    }
+    return render(request, "historique.html", context)
 
 @login_required
 def edaia(request):
@@ -128,26 +154,58 @@ def associationAdminsComptes(request):
     
 @login_required
 def associationMedecinPatient(request):
-    medecins = Utilisateurs.objects.filter(role="medecin")
-    patients = Utilisateurs.objects.filter(role="patient")
-    medecin_patient_associations = MedecinPatient.objects.all()
+    user_role = request.session.get('role', '')  # Get the role from the session
+    user_id = request.user.id  # Get the current user's ID
     
+    # If the user is a medecin, filter the medecins queryset to include only the current user
+    if user_role == "medecin":
+        medecins = Utilisateurs.objects.filter(id=user_id, role="medecin")
+    else:
+        medecins = Utilisateurs.objects.filter(role="medecin")
+
+    patients = Utilisateurs.objects.filter(role="patient")
+    medecin_patient_associations = MedecinPatient.objects.select_related('medecin').prefetch_related('patient')
+
     if request.method == "POST":
-        medecin_id = request.POST["medecin"]
-        patient_ids = request.POST.getlist("patients")
-        print("Medecin ID:", medecin_id)
-        print("Patient IDs:", patient_ids)
-
-        # Get the selected medic
-        medic = Utilisateurs.objects.get(id=medecin_id)
-        print(medic)
-
-        # Associate the selected patients with the medic
-        medecin_patient, created = MedecinPatient.objects.get_or_create(medecin=medic)
-        for patient_id in patient_ids:
-            patient = Utilisateurs.objects.get(id=patient_id)
-            medecin_patient.patient.add(patient)
+        # Check if the request is for admin validation
+        if 'validate_association' in request.POST:
+            association_id = request.POST.get('validate_association')
+            if user_role in ['admin', 'superadmin']:
+                association = get_object_or_404(MedecinPatient, id=association_id)
+                association.is_admin_validation = True
+                association.save()
+            else:
+                return HttpResponseForbidden("You do not have permission to perform this action.")
         
+        else:  # The request is for creating/updating an association
+            medecin_id = request.POST.get("medecin")
+            patient_ids = request.POST.getlist("patients")
+            
+            # Get the selected medic, ensuring the medic is the current user if they are a medecin
+            if user_role == "medecin" and str(user_id) != medecin_id:
+                # Handle error: medecin can only modify their own associations
+                # Redirect to an error page or show an error message
+                return redirect("associationMedecinPatient")
+
+            medic = Utilisateurs.objects.get(id=medecin_id)
+            
+            # Get or create the association instance
+            medecin_patient, created = MedecinPatient.objects.get_or_create(medecin=medic)
+            
+            # If new patients are added, reset the admin validation flag
+            if not created:
+                existing_patient_ids = set(medecin_patient.patient.values_list('id', flat=True))
+                new_patient_ids = set(map(int, patient_ids))
+                if not new_patient_ids.issubset(existing_patient_ids):
+                    medecin_patient.is_admin_validation = False
+                    medecin_patient.save()
+
+            # Associate the selected patients with the medic
+            for patient_id in patient_ids:
+                patient = Utilisateurs.objects.get(id=patient_id)
+                medecin_patient.patient.add(patient)
+            
+        # Redirect after POST
         return redirect("associationMedecinPatient")
 
     return render(request, "associationMedecinPatient.html", {
@@ -166,6 +224,18 @@ def associationMedecinPatient(request):
 @login_required
 def formulaire_sante_gen(request):
     if request.method == 'POST':
+        # Connection à la table de jointure pour periodicité du patient_id
+        # Fetch the periodicite for the logged-in patient from the MedecinPatientAssociation
+        try:
+            association = MedecinPatientAssociation.objects.get(patient_id=request.user.id)
+            periodicite_value = association.periodicite
+        except MedecinPatientAssociation.DoesNotExist:
+            # Handle the case where the association does not exist
+            periodicite_value = None  # Or set a default value as appropriate
+        
+        print(periodicite_value)  # For debugging, should show the periodicite or None 
+        
+        
         # Helper function to convert field values
         def convert_field_value(value, field_type):
             if value.strip() == '':
@@ -195,7 +265,7 @@ def formulaire_sante_gen(request):
         form_data = {
             'patient_id': request.user.id,
             'date_remplissage': datetime.date.today(),
-            'periodicite_jours': 30,
+            'periodicite_jours': periodicite_value if periodicite_value is not None else 30,  # Use the retrieved value or a default
             'is_late': False,  # Assuming this is a mandatory field with a default value
             'poids': convert_field_value(request.POST.get("poids", ''), 'float'),
             'tour_de_taille_cm': convert_field_value(request.POST.get("tour_de_taille_cm", ''), 'float'),
@@ -257,4 +327,6 @@ def formulaire_sante_gen(request):
         form = FormulaireSanteForm()
 
     return render(request, 'form_sante.html', {'form': form})
+
+########## Maj periodicité par le medecin ############################
 

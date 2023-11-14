@@ -22,7 +22,7 @@ def connexion(request):
         if verification != None:
             login(request, verification)
             request.session['username'] = request.user.username
-            request.session['role'] = "superuser" if request.user.is_superuser else request.user.role
+            request.session['role'] = "superadmin" if request.user.is_superuser else request.user.role
             print(request.session['username'])
             print(request.session['role'])
             return redirect("accueil")

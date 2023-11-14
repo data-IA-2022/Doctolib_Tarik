@@ -1,34 +1,55 @@
-<!-- historique.html -->
 {% extends 'base.html' %}
+
 {% load static %}
 {% block title %}Historique data patient - ToubibLib{% endblock %}
 {% block content %}
 <div class="w-full flex flex-col items-center px-4 py-5">
-  <h2 class="text-xl font-semibold mb-4">Bienvenue dans la zone Historique Données Patients {{ request.session.username }}</h2>
-  <div class="w-full overflow-x-auto">
-    <h2 class="text-lg font-semibold mb-3">Table données Formulaire santé</h2>
-    <table id="example" class="min-w-full">
-        <thead>
-            <tr>
-                {% for colonne in champsFormulaireSante %}
-                <th class="px-4 py-2 bg-gray-100">
-                    {{ colonne }}
-                </th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-        {% for data in dataFormulaireSante %}
-        <tr>
-            {% for element in data %}
-                <td class="border px-4 py-2">
-                {{ element }}
-                </td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-  </div>
+    <h2 class="text-xl font-semibold mb-4">Bienvenue dans la zone Historique Données Patients {{ request.session.username }}</h2>
+    {% if user_role == 'medecin' %}
+        <!-- Use the PeriodiciteForm -->
+        <form method="post" action="{% url 'historique' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Set Periodicite">
+        </form>
+    {% endif %}
+    <div class="w-full overflow-x-auto">
+        <h2 class="text-lg font-semibold mb-3">Table données Formulaire santé</h2>
+        <form method="post">
+            {% csrf_token %}
+            <table id="example" class="min-w-full">
+                <thead>
+                    <tr>
+                        {% for colonne in champsFormulaireSante %}
+                        <th class="px-4 py-2 bg-gray-100">
+                            {{ colonne }}
+                        </th>
+                        {% endfor %}
+                        {% if user_role == 'medecin' %}
+                        <th class="px-4 py-2 bg-gray-100">Action</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in dataFormulaireSante %}
+                    <tr>
+                        {% for key, value in data.items %}
+                            <td class="border px-4 py-2">
+                                {{ value }}
+                            </td>
+                        {% endfor %}
+                        {% if user_role == 'medecin' %}
+                        <td>
+                            <!-- Include a form for updating periodicite -->
+                            <input type="number" name="periodicite_jours_{{ data.id }}" value="{{ data.periodicite_jours }}" required>
+                            <input type="hidden" name="form_id" value="{{ data.id }}">
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    </div>
 </div>
 {% endblock %}

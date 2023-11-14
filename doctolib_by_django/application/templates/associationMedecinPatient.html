@@ -36,14 +36,27 @@
         </th>
     </tr>
     {% for association in medecin_patient_associations %}
-    <tr>
-        <td>{{ association.medecin.username }}</td>
-        <td>
-            {% for patient in association.patient.all %}
-            {{ patient.username }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        </td>
-    </tr>
+        <tr>
+            <td>{{ association.medecin.username }}</td>
+            <td>
+                {% for patient in association.patient.all %}
+                {{ patient.username }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            {% if request.user.role == 'admin' or request.user.role == 'superadmin' %}
+            <td>
+                {% if association.is_admin_validation %}
+                <span>Validated</span>
+                {% else %}
+                <form method="post" action="{% url 'associationMedecinPatient' %}"> <!-- Update this URL to the correct one -->
+                    {% csrf_token %}
+                    <input type="hidden" name="validate_association" value="{{ association.id }}">
+                    <button type="submit">Validate</button>
+                </form>
+                {% endif %}
+            </td>
+            {% endif %}
+        </tr>
     {% endfor %}
 </table>
 

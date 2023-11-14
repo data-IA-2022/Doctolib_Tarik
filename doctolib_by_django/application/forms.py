@@ -1,5 +1,5 @@
 from django import forms
-from .models import Utilisateurs, FormulaireSante
+from .models import Utilisateurs, FormulaireSante, MedecinPatientAssociation
 
 class AccountGenerationForm(forms.Form):
     num_accounts = forms.IntegerField(label='Number of Accounts', min_value=1)
@@ -28,3 +28,7 @@ class FormulaireSanteForm(forms.ModelForm):
         model = FormulaireSante
         fields = '__all__'
 
+class PeriodiciteForm(forms.ModelForm):
+    class Meta:
+        model = MedecinPatientAssociation
+        fields = ['periodicite']

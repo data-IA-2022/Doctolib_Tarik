@@ -31,11 +31,11 @@
                 <span @click="openAssocDropdown = !openAssocDropdown" class="cursor-pointer px-2 py-1 hover:bg-gray-300 rounded-md">Création & Associations</span>
                 <ul x-show="openAssocDropdown" class="dropdown-content absolute space-y-2 bg-gray-300 text-blue-500">
                     ...
-                    {% if request.session.role == "superuser" %}
+                    {% if request.session.role == "superadmin" %}
                         <li><a href="{% url 'comptes' %}">Comptes</a></li>
                         <li><a href="{% url 'associationAdminsComptes' %}">Associé un ou plusieurs Admin(s) à des comptes utilisateurs</a></li>
                     {% endif %}
-                    {% if request.session.role == "admin" or request.session.role == "superuser" %}
+                    {% if request.session.role == "admin" or request.session.role == "superadmin" or request.session.role == "medecin" %}
                         <li><a href="{% url 'associationMedecinPatient' %}">Associé un ou plusieurs Médecin(s) à des comptes patients</a></li>
                     {% endif %}
                 </ul>
@@ -79,11 +79,11 @@
                 <span @click="openAssocDropdown = !openAssocDropdown" class="cursor-pointer px-2 py-1 hover:bg-gray-300 rounded-md">Création & Associations</span>
                 <ul x-show="openAssocDropdown" class="dropdown-content absolute space-y-2 bg-gray-300 text-blue-500">
                     ...
-                    {% if request.session.role == "superuser" %}
+                    {% if request.session.role == "superadmin" %}
                         <li><a  class="text-xs sm:text-md" href="{% url 'comptes' %}">Comptes</a></li>
                         <li><a class="text-xs sm:text-md" href="{% url 'associationAdminsComptes' %}">Associé un ou plusieurs Admin(s) à des comptes utilisateurs</a></li>
                     {% endif %}
-                    {% if request.session.role == "admin" or request.session.role == "superuser" %}
+                    {% if request.session.role == "admin" or request.session.role == "superadmin"  or request.session.role == "medecin" %}
                         <li><a class="text-xs sm:text-md" href="{% url 'associationMedecinPatient' %}">Associé un ou plusieurs Médecin(s) à des comptes patients</a></li>
                     {% endif %}
                 </ul>
