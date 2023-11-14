@@ -16,7 +16,7 @@ class Command(BaseCommand):
         fake = Faker()
         
         # Define the range of patient IDs
-        min_patient_id = 16
+        min_patient_id = 8
         max_patient_id = 23
         
         # Create a dictionary to keep track of the last form date for each patient
@@ -27,6 +27,14 @@ class Command(BaseCommand):
 
         # Define the periodicity for each patient
         periodicity = {
+            8: 30,
+            9: 15,
+            10: 20,
+            11: 7,
+            12: 14,
+            13: 20,
+            14: 30,
+            15: 15,
             16: 30,
             17: 15,
             18: 20,
