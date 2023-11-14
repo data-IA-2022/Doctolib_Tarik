@@ -225,7 +225,30 @@ def associationMedecinPatient(request):
 #     return render(request, "form_sante.html")
 @login_required
 def formulaire_sante_gen(request):
-    if request.method == 'POST':
+    # Fetch the periodicite for the logged-in patient from the MedecinPatientAssociation
+    try:
+        association = MedecinPatientAssociation.objects.get(patient_id=request.user.id)
+        periodicite_value = association.periodicite
+    except MedecinPatientAssociation.DoesNotExist:
+        periodicite_value = None  # Default value if the association does not exist
+
+    if request.method == 'GET':
+        # Check if it's too early to submit the form
+        try:
+            last_formulaire = FormulaireSante.objects.filter(patient_id=request.user.id).latest('date_remplissage')
+            last_date_remplissage = last_formulaire.date_remplissage
+        except FormulaireSante.DoesNotExist:
+            last_date_remplissage = None
+
+        next_due_date = (last_date_remplissage + datetime.timedelta(days=periodicite_value)) if last_date_remplissage and periodicite_value is not None else datetime.date.today()
+
+        if datetime.date.today() < next_due_date:
+            return render(request, 'too_early.html', {'next_due_date': next_due_date.strftime("%Y-%m-%d")})
+
+        form = FormulaireSanteForm()
+        return render(request, 'form_sante.html', {'form': form})
+    
+    elif request.method == 'POST':
         # Connection à la table de jointure pour periodicité du patient_id
         # Fetch the periodicite for the logged-in patient from the MedecinPatientAssociation
         try:
@@ -254,6 +277,9 @@ def formulaire_sante_gen(request):
         is_late = today > next_due_date
         is_early = today < next_due_date
         
+        # Calculate the next due date based on current submission
+        new_next_due_date = datetime.date.today() + datetime.timedelta(days=periodicite_value if periodicite_value is not None else 30)
+        
         # Helper function to convert field values
         def convert_field_value(value, field_type):
             if value.strip() == '':
@@ -278,6 +304,8 @@ def formulaire_sante_gen(request):
                 except ValueError:
                     return None
             return None
+        
+               
         
         # Process each field from the form
         form_data = {
@@ -340,7 +368,7 @@ def formulaire_sante_gen(request):
         formulaire_sante = FormulaireSante(**form_data)
         formulaire_sante.save()
 
-        return HttpResponse('Formulaire envoyé')
+        return render(request, 'form_send.html', {'next_due_date': new_next_due_date.strftime("%Y-%m-%d")})
 
     else:
         form = FormulaireSanteForm()

@@ -1,0 +1,8 @@
+<!-- too_early.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="alert alert-warning">
+        <p>You have already completed your form for the last period. The next period starts on {{ next_due_date }}.</p>
+    </div>
+{% endblock %}
