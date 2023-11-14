@@ -1,6 +1,6 @@
 from faker import Faker
 import random
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.core.management.base import BaseCommand
 from application.models import Utilisateurs, FormulaireEvalStress
 
@@ -45,10 +45,10 @@ class Command(BaseCommand):
             patient_id = random.randint(min_patient_id, max_patient_id)
 
             last_date = last_form_dates.get(patient_id, None)
-
+            end_date = datetime(2023, 11, 10) 
             # Get the next form date for this patient
             if last_date is None:
-                date_remplissage = fake.date_between(start_date="-365d", end_date="today")
+                date_remplissage = fake.date_between(start_date="-365d", end_date=end_date)
             else:
                 # Calculate the next form date based on the patient's periodicity
                 date_remplissage = last_date + timedelta(days=periodicity.get(patient_id, 30))
