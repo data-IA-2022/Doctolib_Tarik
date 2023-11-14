@@ -78,6 +78,9 @@ class Command(BaseCommand):
 
             # Boolean for is_late
             is_late = fake.boolean(chance_of_getting_true=30)
+            
+            # Boolean for is_early
+            is_early = fake.boolean(chance_of_getting_true=30)
 
             imc_category = fake.random_element(elements=('healthy', 'overweight', 'obesity1', 'obesity2'))
             if patient_id not in patient_weights:
@@ -227,6 +230,7 @@ class Command(BaseCommand):
                 date_remplissage=date_remplissage,
                 periodicite_jours=periodicite_jours,
                 is_late=is_late,
+                is_early=is_early,
                 poids=poids,
                 tour_de_taille_cm=tour_de_taille_cm,
                 frequence_cardiaque_min=frequence_cardiaque_min,

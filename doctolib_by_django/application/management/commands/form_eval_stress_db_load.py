@@ -61,6 +61,7 @@ class Command(BaseCommand):
                 'date_remplissage': date_remplissage,
                 'periodicite_jours': periodicity.get(patient_id, 30),
                 'is_late': fake.boolean(chance_of_getting_true=30),
+                'is_early': fake.boolean(chance_of_getting_true=30),
                 'irritabilite': random.choice([0, 1, 5, 10]),
                 'sentiments_depressifs': random.choice([0, 1, 5, 10]),
                 'bouche_seche_gorge_seche': random.choice([0, 1, 5, 10]),
