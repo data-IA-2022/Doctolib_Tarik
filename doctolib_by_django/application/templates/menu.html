@@ -23,6 +23,14 @@
             
             <li><a href="{% url 'historique' %}">Historique</a></li>
             {% if request.session.role == "medecin" %}
+                <!-- For "Formulaires" Dropdown -->
+                <li class="dropdown relative" x-data="{ openDropdown: false }">
+                    <span @click="openDropdown = !openDropdown" class="cursor-pointer px-2 py-1 hover:bg-gray-300 rounded-md">Màj & Suppression</span>
+                    <ul x-show="openDropdown" class="dropdown-content absolute space-y-2 bg-gray-300 text-blue-500">
+                        <li><a href="{% url 'crud_form_sante' %}">Màj & Suppression: formulaire de santé générale</a></li>
+                        <li><a href="#">Màj & Suppression: formulaire de niveau de stress</a></li>
+                    </ul>
+                </li>
                 <li><a href="{% url 'edaia' %}">EDA et IA</a></li>
             {% endif %}
             
@@ -72,6 +80,14 @@
             </li>
             <li><a class="text-xs sm:text-md" href="{% url 'historique' %}" class="hover:text-gray-200">Historique</a></li>
             {% if request.session.role == "medecin" %}
+                <!-- For "Formulaires" Dropdown -->
+                <li class="dropdown relative" x-data="{ openDropdown: false }">
+                    <span @click="openDropdown = !openDropdown" class="cursor-pointer px-2 py-1 hover:bg-gray-300 rounded-md">Màj & Suppression:</span>
+                    <ul x-show="openDropdown" class="dropdown-content absolute space-y-2 bg-gray-300 text-blue-500">
+                        <li><a href="{% url 'crud_form_sante' %}">Màj & Suppression: formulaire de santé générale</a></li>
+                        <li><a href="#">Màj & Suppression: formulaire de niveau de stress</a></li>
+                    </ul>
+                </li>
                 <li><a class="text-xs sm:text-md" href="{% url 'edaia' %}">EDA et IA</a></li>
             {% endif %}
             <!-- Dropdown for Création & Associations -->

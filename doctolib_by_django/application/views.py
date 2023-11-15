@@ -387,11 +387,8 @@ def crud_form_sante(request):
 
     selected_patient = request.GET.get('patient')
     selected_date_str = request.GET.get('date')
-
-    # Initialize dates as empty
     dates = []
 
-    # Populate dates only after a patient is selected
     if selected_patient:
         dates = FormulaireSante.objects.filter(patient_id=selected_patient).values_list('date_remplissage', flat=True).distinct()
 
@@ -404,11 +401,24 @@ def crud_form_sante(request):
             messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
 
     if request.method == 'POST':
-        form = FormulaireSanteEditForm(request.POST, instance=formulaire_sante)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Form saved successfully.")
-            return redirect('update_success')
+        action = request.POST.get('action', 'update')  # Default to 'update' if action is not specified
+
+        if action == 'delete':
+            if formulaire_sante:
+                formulaire_sante.delete()
+                messages.success(request, "Record deleted successfully.")
+                return redirect('update_success')  # Replace with your desired redirect URL
+            else:
+                messages.error(request, "No record to delete.")
+
+        elif action == 'update':
+            form = FormulaireSanteEditForm(request.POST, instance=formulaire_sante)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Form updated successfully.")
+                return redirect('update_success')
+            else:
+                messages.error(request, "Form validation error.")
     else:
         form = FormulaireSanteEditForm(instance=formulaire_sante)
 

@@ -32,38 +32,135 @@
             </div>
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Load Data</button>
         </form>
-
-        <!-- Form for Editing Data -->
+         <!-- Progress Bar -->
+         <div class="progress w-full bg-gray-200 rounded-full h-2 mb-4">
+            <div class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 20%;"></div>
+        </div>
+        <!-- Multi-Step Form -->
         <form method="post" id="crud_form_sante" class="space-y-6">
+            {% csrf_token %}
+            <!-- Step 1: General Information -->
+            <div class="form-step active" data-step="1">
+                <h2 class="text-xl font-semibold mb-4">Informations générales</h2>
+                {{ form.poids.label_tag }} {{ form.poids }}
+                {{ form.tour_de_taille_cm.label_tag }} {{ form.tour_de_taille_cm }}
+                <div class="flex justify-end">
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Next</button>
+                </div>
+            </div>
+            <!-- Step 2: Cardiac Information -->
+            <div class="form-step" data-step="2">
+                <h2 class="text-xl font-semibold mb-4">Informations cardiaques et tension artérielle</h2>
+                {{ form.frequence_cardiaque_min.label_tag }} {{ form.frequence_cardiaque_min }}
+                {{ form.tension_arterielle_systolique_matin.label_tag }} {{ form.tension_arterielle_systolique_matin }}
+                {{ form.tension_arterielle_systolique_soir.label_tag }} {{ form.tension_arterielle_systolique_soir }}
+                {{ form.tension_arterielle_diastolique_matin.label_tag }} {{ form.tension_arterielle_diastolique_matin }}
+                {{ form.tension_arterielle_diastolique_soir.label_tag }} {{ form.tension_arterielle_diastolique_soir }}
+                {{ form.symptomes_cardiovasculaires.label_tag }} {{ form.symptomes_cardiovasculaires }}
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Previous</button>
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Next</button>
+                </div>
+            </div>
+            <!-- Step 3: Medication Intake -->
+            <div class="form-step" data-step="3">
+                <h2 class="text-xl font-semibold mb-4">Prise de médicaments</h2>
+                {{ form.nb_medicaments_jour.label_tag }} {{ form.nb_medicaments_jour }}
+                {{ form.oublie_medicament_matin.label_tag }} {{ form.oublie_medicament_matin }}
+                {{ form.oublie_medicament_soir.label_tag }} {{ form.oublie_medicament_soir }}
+                {{ form.effets_secondaires.label_tag }} {{ form.effets_secondaires }}
+                {{ form.symptomes_particuliers.label_tag }} {{ form.symptomes_particuliers }}
+                {{ form.description_symptomes_particuliers.label_tag }} {{ form.description_symptomes_particuliers }}
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Previous</button>
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Dietary Habits -->
+            <div class="form-step" data-step="4">
+                <h2 class="text-xl font-semibold mb-4">Alimentation</h2>
+                {{ form.consommation_alcool.label_tag }} {{ form.consommation_alcool }}
+                {{ form.grignotage_sucre.label_tag }} {{ form.grignotage_sucre }}
+                {{ form.grignotage_sale.label_tag }} {{ form.grignotage_sale }}
+                {{ form.nb_repas_jour.label_tag }} {{ form.nb_repas_jour }}
+                {{ form.quantite_eau_litres.label_tag }} {{ form.quantite_eau_litres }}
+                {{ form.quantite_alcool_litres.label_tag }} {{ form.quantite_alcool_litres }}
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Previous</button>
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Physical Activity -->
+            <div class="form-step" data-step="5">
+                <h2 class="text-xl font-semibold mb-4">Activité physique</h2>
+                {{ form.activite_physique.label_tag }} {{ form.activite_physique }}
+                {{ form.nature_activite_physique.label_tag }} {{ form.nature_activite_physique }}
+                {{ form.duree_activite_physique_min.label_tag }} {{ form.duree_activite_physique_min }}
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Previous</button>
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Other Symptoms -->
+            <div class="form-step" data-step="6">
+                <h2 class="text-xl font-semibold mb-4">Autres symptômes</h2>
+                {{ form.dyspnee.label_tag }} {{ form.dyspnee }}
+                {{ form.oedeme.label_tag }} {{ form.oedeme }}
+                {{ form.pre_episode_ir.label_tag }} {{ form.pre_episode_ir }}
+                {{ form.fievre.label_tag }} {{ form.fievre }}
+                {{ form.palpitation.label_tag }} {{ form.palpitation }}
+                {{ form.douleur_thoracique.label_tag }} {{ form.douleur_thoracique }}
+                {{ form.malaise.label_tag }} {{ form.malaise }}
+                {{ form.heure_debut_palpitations.label_tag }} {{ form.heure_debut_palpitations }}
+                {{ form.duree_total_palpitations_min.label_tag }} {{ form.duree_total_palpitations_min }}
+                {{ form.heure_debut_douleurs_thoraciques.label_tag }} {{ form.heure_debut_douleurs_thoraciques }}
+                {{ form.duree_total_douleurs_thoraciques_min.label_tag }} {{ form.duree_total_douleurs_thoraciques_min }}
+                {{ form.heure_debut_malaises.label_tag }} {{ form.heure_debut_malaises }}
+                {{ form.duree_total_malaises_min.label_tag }} {{ form.duree_total_malaises_min }}
+                <div class="flex justify-between">
+                    <button type="button" class="prev px-4 py-2 bg-gray-300 text-black rounded-full hover:bg-gray-400">Previous</button>
+                    <button type="button" class="next px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 7: Additional Medical Information -->
+            <div class="form-step" data-step="7">
+                <h2 class="text-xl font-semibold mb-4">Autres informations médicales</h2>
+                {{ form.natremie_mmol_per_l.label_tag }} {{ form.natremie_mmol_per_l }}
+                {{ form.potassium_mmol_per_l.label_tag }} {{ form.potassium_mmol_per_l }}
+                {{ form.creatinine_umol_per_l.label_tag }} {{ form.creatinine_umol_per_l }}
+                {{ form.clairance_creatinine_ml_per_min.label_tag }} {{ form.clairance_creatinine_ml_per_min }}
+                {{ form.nt_probnp_ng_per_l.label_tag }} {{ form.nt_probnp_ng_per_l }}
+                {{ form.fer_serique_mg_per_l.label_tag }} {{ form.fer_serique_mg_per_l }}
+                {{ form.hemoglobine_g_per_100_ml.label_tag }} {{ form.hemoglobine_g_per_100_ml }}
+                {{ form.vitesse_sedimentation_mm.label_tag }} {{ form.vitesse_sedimentation_mm }}
+                {{ form.proteine_c_reactive_mg_per_l.label_tag }} {{ form.proteine_c_reactive_mg_per_l }}
+                {{ form.troponine_ug_per_l.label_tag }} {{ form.troponine_ug_per_l }}
+                {{ form.vitamine_d_ng_per_ml.label_tag }} {{ form.vitamine_d_ng_per_ml }}
+                {{ form.acide_urique_mg_per_l.label_tag }} {{ form.acide_urique_mg_per_l }}
+                {{ form.inr.label_tag }} {{ form.inr }}
+                <div class="flex justify-between">
+                    <!-- Hidden input to indicate delete action -->
+                    <input type="hidden" name="action" value="update">
+                    <button type="button" onclick="confirmDelete()" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700">Delete</button>
+                    <input type="submit" value="Update" class="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">
+                </div>
+            </div>
+        </form>
+        <!-- <form method="post" id="crud_form_sante" class="space-y-6">
             {% csrf_token %}
             {{ form.as_p }}
             <div class="flex justify-end">
                 <input type="submit" value="Update" class="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">
             </div>
-        </form>
+        </form> -->
     </div>
 </div>
 <!-- JavaScript to Fetch Dates -->
-<script>
-  document.getElementById('patient_select').addEventListener('change', function() {
-      var patientId = this.value;
-      fetch(`/get-dates-for-patient/${patientId}`)
-          .then(response => response.json())
-          .then(data => {
-              var dateSelect = document.getElementById('date_select');
-              dateSelect.innerHTML = ''; // Clear existing options
-              data.dates.forEach(function(date) {
-                  var option = new Option(date, date);
-                  dateSelect.add(option);
-              });
-          });
-  });
-  
-  // Assuming you have a button with id 'load_data'
-  document.getElementById('load_data').addEventListener('click', function() {
-      // Perform the action you want on click, 
-      // but do not clear or reset the dropdown selections.
-      // This part of the code will depend on what you want to achieve when "Load Data" is clicked.
-  });
-  </script>
+{% block scripts %}
+<script src="{% static '/js/crud_form_sante.js' %}"></script>
+{% endblock %}
 {% endblock %}
