@@ -43,7 +43,7 @@
                 {{ patient.username }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </td>
-            {% if request.user.role == 'admin' or request.user.role == 'superadmin' %}
+            {% if request.user.role == 'admin' or request.user.is_superuser  %}
             <td>
                 {% if association.is_admin_validation %}
                 <span>Validated</span>

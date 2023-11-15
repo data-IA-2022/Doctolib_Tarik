@@ -31,10 +31,19 @@ class MedecinPatientAssociation(models.Model):
 # Association Table between Admins and Medecins
 class AdminCompte(models.Model):
     admin = models.ForeignKey(Utilisateurs, on_delete=models.CASCADE, related_name='comptes_admin', limit_choices_to={'role': 'admin'})
-    users = models.ManyToManyField(Utilisateurs, related_name='admins', limit_choices_to={'role__in': ['admin', 'medecin', 'patient']})
+    # Changed the ManyToManyField to use a through model
+    users = models.ManyToManyField(Utilisateurs, through='AdminCompteAssociation', related_name='admins', limit_choices_to={'role__in': ['medecin', 'patient']})
     
     class Meta:
         db_table = 'AdminCompte'
+
+class AdminCompteAssociation(models.Model):
+    admin_compte = models.ForeignKey(AdminCompte, on_delete=models.CASCADE)
+    user = models.ForeignKey(Utilisateurs, on_delete=models.CASCADE)
+    # You can add additional fields here if needed, like 'periodicite' in MedecinPatientAssociation
+
+    class Meta:
+        db_table = 'AdminCompte_association'
 
 
 

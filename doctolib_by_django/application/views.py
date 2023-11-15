@@ -1,16 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.dateparse import parse_time
-from .forms import AccountGenerationForm, EmailAssociationForm, FormulaireSanteForm, PeriodiciteForm
+from .forms import AccountGenerationForm, EmailAssociationForm, FormulaireSanteForm, PeriodiciteForm, FormulaireSanteEditForm
 from django.views.generic.edit import FormView
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, JsonResponse
 from django.urls import reverse
 from django.forms.models import model_to_dict
 from django.db.models import F
 
 from django.contrib import messages
 from authentification.models import Utilisateurs
-from application.models import AdminCompte, MedecinPatient, FormulaireSante, MedecinPatientAssociation
+from application.models import AdminCompte, MedecinPatient, FormulaireSante, MedecinPatientAssociation, AdminCompteAssociation
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -20,6 +20,8 @@ from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
  
 import datetime
+from django.utils.dateparse import parse_date
+
 
 
 # Create your views here.
@@ -375,5 +377,54 @@ def formulaire_sante_gen(request):
 
     return render(request, 'form_sante.html', {'form': form})
 
-########## Maj periodicité par le medecin ############################
+########## Crud formulaire santé par le medecin admin etc ############################
 
+@login_required
+def crud_form_sante(request):
+    role = "superuser" if request.user.is_superuser else request.user.role
+    user = request.user
+    patients = Utilisateurs.objects.filter(role='patient') if role in ['admin', 'superadmin'] else Utilisateurs.objects.filter(medecinpatientassociation__medecin__medecin=user)
+
+    selected_patient = request.GET.get('patient')
+    selected_date_str = request.GET.get('date')
+
+    # Initialize dates as empty
+    dates = []
+
+    # Populate dates only after a patient is selected
+    if selected_patient:
+        dates = FormulaireSante.objects.filter(patient_id=selected_patient).values_list('date_remplissage', flat=True).distinct()
+
+    formulaire_sante = None
+    if selected_patient and selected_date_str:
+        try:
+            formatted_date = datetime.datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+            formulaire_sante = get_object_or_404(FormulaireSante, patient_id=selected_patient, date_remplissage=formatted_date)
+        except ValueError:
+            messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
+
+    if request.method == 'POST':
+        form = FormulaireSanteEditForm(request.POST, instance=formulaire_sante)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Form saved successfully.")
+            return redirect('update_success')
+    else:
+        form = FormulaireSanteEditForm(instance=formulaire_sante)
+
+    context = {
+        'patients': patients,
+        'selected_patient': selected_patient,
+        'dates': dates,
+        'selected_date': selected_date_str,
+        'form': form
+    }
+    return render(request, 'crud_form_sante.html', context)
+
+# Success landing page
+def get_dates_for_patient(request, patient_id):
+    dates = FormulaireSante.objects.filter(patient_id=patient_id).values_list('date_remplissage', flat=True).distinct()
+    return JsonResponse({'dates': list(dates)})
+
+def update_success(request):
+    return render(request, 'update_success.html')
