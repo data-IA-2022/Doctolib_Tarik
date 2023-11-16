@@ -151,6 +151,6 @@ Il vous faut dans cet ordre:
 
 - [Expliquez ce que fait la vue `crud_form_sante` et son objectif, y compris la mise à jour et la suppression des données du formulaire.]
 
-## Licence
+## Test unitaire
 
-[Spécifiez la licence de votre application Django, le cas échéant.]
+Test avec pytest non fonctionnel (V1)
