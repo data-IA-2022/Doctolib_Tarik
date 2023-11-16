@@ -22,6 +22,8 @@ from django.template.loader import render_to_string
 import datetime
 from django.utils.dateparse import parse_date
 
+import json
+
 
 
 # Create your views here.
@@ -83,10 +85,80 @@ def historique(request):
 
 @login_required
 def edaia(request):
-    if request.user.role != "medecin":
+    if request.user.role == "patient":
         return redirect("https://media.tenor.com/2euSOQYdz8oAAAAj/this-was-technically-illegal-maclen-stanley.gif")
     else:
-        return render(request, "edaia.html")
+        user_role = request.session.get('role')
+        user_id = request.user.id
+
+        # Define fields for the dropdown
+        fields = [
+            'poids',
+            'tour_de_taille_cm', 
+            'frequence_cardiaque_min',
+            'tension_arterielle_systolique_matin', 
+            'tension_arterielle_systolique_soir', 
+            'tension_arterielle_diastolique_matin', 
+            'tension_arterielle_diastolique_soir', 
+            'symptomes_cardiovasculaires', 
+            'nb_medicaments_jour',
+            'nb_repas_jour', 
+            'quantite_eau_litres', 
+            'quantite_alcool_litres', 
+            'natremie_mmol_per_l', 
+            'potassium_mmol_per_l', 
+            'creatinine_umol_per_l', 
+            'clairance_creatinine_ml_per_min', 
+            'nt_probnp_ng_per_l', 
+            'fer_serique_mg_per_l', 
+            'hemoglobine_g_per_100_ml', 
+            'vitesse_sedimentation_mm', 
+            'proteine_c_reactive_mg_per_l', 
+            'troponine_ug_per_l', 
+            'vitamine_d_ng_per_ml', 
+            'acide_urique_mg_per_l',
+            'inr'
+        ]
+
+        patients_data = FormulaireSante.objects.none()  # Default empty queryset
+
+        # Filter data based on user role
+        if user_role in ['superadmin']:
+            patients_data = FormulaireSante.objects.all()
+            patient_ids = Utilisateurs.objects.filter(role='patient').values_list('id', flat=True)
+        elif user_role == 'admin':
+            # Fetching the IDs of users associated with the admin where role is 'patient'
+            admin_compte_ids = AdminCompte.objects.filter(admin_id=user_id).values_list('id', flat=True)
+            patient_ids = AdminCompteAssociation.objects.filter(
+                admin_compte_id__in=admin_compte_ids,
+                user__role='patient'  # Filtering where the user's role is 'patient'
+            ).values_list('user_id', flat=True)
+            patients_data = FormulaireSante.objects.filter(patient_id__in=patient_ids)
+        elif user_role == 'medecin':
+            patient_ids = MedecinPatientAssociation.objects.filter(
+                medecin__id=user_id
+            ).values_list('patient_id', flat=True)
+            patients_data = FormulaireSante.objects.filter(patient_id__in=patient_ids)
+
+        # Prepare data for each patient
+        chart_data = {}
+        for patient_id in patient_ids:
+            patient_name = Utilisateurs.objects.get(id=patient_id).username
+            patient_data = patients_data.filter(patient_id=patient_id)
+            for field in fields:
+                if field not in chart_data:
+                    chart_data[field] = []
+                chart_data[field].append({
+                    'label': patient_name,
+                    'data': list(patient_data.values_list(field, flat=True))
+                })
+        
+        context = {
+            'fields': fields,
+            'chart_data': json.dumps(chart_data),
+            'user_role': user_role
+        }
+        return render(request, "edaia.html", context)
     
 
 @login_required
@@ -438,3 +510,6 @@ def get_dates_for_patient(request, patient_id):
 
 def update_success(request):
     return render(request, 'update_success.html')
+
+
+

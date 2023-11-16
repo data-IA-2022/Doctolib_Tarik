@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load static %}
 {% block title %}EDA IA - ToubibLib{% endblock %}
 {% block content %}
@@ -6,4 +7,49 @@
 
 <h1>Bienvenue dans la zone EDA IA {{ request.session.username }} !</h1>
 
+<!-- Dropdown for selecting the field -->
+<select id="fieldSelector">
+  {% for field in fields %}
+  <option value="{{ field }}">{{ field }}</option>
+  {% endfor %}
+</select>
+<div class="w-1/2 h-auto">
+  <!-- Canvas element for Chart.js -->
+  <canvas id="healthChart" ></canvas>
+</div>
+
+<script>
+  
+  // Parse the JSON data from the Django context
+  const chartData = JSON.parse('{{ chart_data|safe }}');
+  let healthChart;
+  const ctx = document.getElementById('healthChart').getContext('2d');
+
+  function updateChart(selectedField) {
+      if (healthChart) {
+          healthChart.destroy();
+      }
+      healthChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: chartData[selectedField].map((_, i) => `Point ${i + 1}`), // Assuming equal length for all
+              datasets: chartData[selectedField]
+          },
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              }
+          }
+      });
+  }
+
+  document.getElementById('fieldSelector').addEventListener('change', function() {
+      updateChart(this.value);
+  });
+
+  // Initialize the chart with the first field
+  updateChart(document.getElementById('fieldSelector').value);
+</script>
 {% endblock %}
