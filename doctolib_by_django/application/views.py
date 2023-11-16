@@ -92,6 +92,7 @@ def edaia(request):
     else:
         user_role = request.session.get('role')
         user_id = request.user.id
+        print(user_id)
 
         # Define fields for the dropdown
         fields = [
@@ -141,7 +142,8 @@ def edaia(request):
                 medecin__id=user_id
             ).values_list('patient_id', flat=True)
             patients_data = FormulaireSante.objects.filter(patient_id__in=patient_ids)
-
+            # print("Patient IDs for medecin:", patient_ids)  # Debugging
+            
         # Prepare data for each patient
         chart_data = {}
         for patient_id in patient_ids:
