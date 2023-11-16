@@ -6,7 +6,7 @@ from django.views.generic.edit import FormView
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, JsonResponse
 from django.urls import reverse
 from django.forms.models import model_to_dict
-from django.db.models import F
+from django.db.models import F, Count
 
 from django.contrib import messages
 from authentification.models import Utilisateurs
@@ -23,6 +23,8 @@ import datetime
 from django.utils.dateparse import parse_date
 
 import json
+
+from django.db.models.functions import TruncMonth
 
 
 
@@ -152,10 +154,18 @@ def edaia(request):
                     'label': patient_name,
                     'data': list(patient_data.values_list(field, flat=True))
                 })
+        # Assuming 'date_remplissage' is the name of your date field in the FormulaireSante model
+        date_labels_queryset = FormulaireSante.objects.annotate(
+            month=TruncMonth('date_remplissage')
+        ).values('month').annotate(count=Count('id')).order_by('month')
         
+        # Format date labels for Chart.js
+        formatted_date_labels = [date['month'].strftime('%Y-%m') for date in date_labels_queryset]
+
         context = {
             'fields': fields,
             'chart_data': json.dumps(chart_data),
+            'date_labels': json.dumps(formatted_date_labels),
             'user_role': user_role
         }
         return render(request, "edaia.html", context)

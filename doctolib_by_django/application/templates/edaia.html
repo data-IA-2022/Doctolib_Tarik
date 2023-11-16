@@ -22,6 +22,7 @@
   
   // Parse the JSON data from the Django context
   const chartData = JSON.parse('{{ chart_data|safe }}');
+  const dateLabels = JSON.parse('{{ date_labels|safe }}');
   let healthChart;
   const ctx = document.getElementById('healthChart').getContext('2d');
 
@@ -32,7 +33,7 @@
       healthChart = new Chart(ctx, {
           type: 'line',
           data: {
-              labels: chartData[selectedField].map((_, i) => `Point ${i + 1}`), // Assuming equal length for all
+              labels: dateLabels,
               datasets: chartData[selectedField]
           },
           options: {
